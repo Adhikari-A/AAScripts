@@ -124,9 +124,9 @@ if na == 0:
   print("switch_chckpt.py path n_previous_checkpoint")
   print("path: path of run output directory")
   print("n_previous_checkpoint: how many previous checkpoints to keep")
-  print()
-  print("If n_previous_checkpoint > 2, the oldest (n_previous_checkpoint - 2)")
-  print("checkpoints will be compressed and stored in path_checkpoints.")
+  # print()
+  # print("If n_previous_checkpoint > 2, the oldest (n_previous_checkpoint - 2)")
+  # print("checkpoints will be compressed and stored in path_checkpoints.")
 
 elif na != 2:
 
