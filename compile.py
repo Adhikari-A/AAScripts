@@ -171,7 +171,7 @@ else:
           op = input("Do you want to proceed? (y/n): ")
           if op != 'y':  good =  False
     
-    if exe:
+    if exe and '-nc' not in sys.argv:
       print("Keeping current stable executable as "+exe+"_stable."+cur_time+".")
       os.system("mv "+exe+" "+exe+"_stable."+cur_time)
     
@@ -237,7 +237,7 @@ else:
         if not os.path.isfile(exe):
           print("No current executable")
           exe = None
-    if exe:
+    if exe and '-nc' not in sys.argv:
       os.system("mv "+exe+" "+exe+"."+cur_time)
   
   if '-r' not in sys.argv and good:
