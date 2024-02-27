@@ -1,2 +1,2 @@
 # AAScripts
-Scripts that help with BAM, Nmesh and Sgrid runs.
+Scripts that help with BAM, Nmesh and Sgrid compiling and run outputs.
