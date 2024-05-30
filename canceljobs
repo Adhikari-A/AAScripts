@@ -1,0 +1,34 @@
+#!/bin/bash
+
+echo ""
+echo "canceljobs"
+echo ""
+export job=$1
+export n=$2
+export command="scancel"
+export list=""
+if [ -z "${job}" ]
+then
+  echo "usage:"
+  echo "canceljobs jobID n"
+  echo "	       | |"
+  echo "	       | number of jobs to be canceled"
+  echo "	       |"
+  echo "	      job ID of the first job in the list to be canceled"
+  echo "" 
+else
+  for (( i=0; i<n; i++ ))
+  do
+    list+=" ${job}"
+    ((job=job+1))
+  done
+  echo "jobs to be cancelled:"
+  echo $list
+  echo ""
+  command+=" $list"
+  echo "putting in 'scancel' command:"
+  echo $command
+  echo ""
+  $command
+  echo ""
+fi
