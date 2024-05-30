@@ -93,10 +93,13 @@ then
     echo -e "${bt}qjob${rt} ${pa}nodes ppn tpn walltime queue constraint njobs jobname command [parfile]${rt}"
     echo
     echo -e "${he}NOTE${rt}: ${bt}qjob${rt} only works if you have placed the associated file \
-${bt}batch_script${rt}"
-    echo -e "      inside the directory: ${bt}~/bin/${rt} ."
+${bt}qjob_script${rt}"
+    echo -e "      inside the directory: ${bt}~/bin/${rt}."
     echo -e "      If you do not have this directory,"
     echo -e "      please create it and put the file there."
+    echo
+    echo -e "To replicate the same functioning as submitjob, set ${pa}tpn${rt} to ${bt}auto${rt}."
+    echo -e "The rest remians the same."
     echo
     echo -e "${he}OPTIONS:${rt}"
     echo -e "${pa}nodes${rt}: total number of nodes for job"
@@ -141,11 +144,13 @@ for ${pa}nodes${rt}"
     echo -e "  ${he}Note${rt}: Sgrid runs should be put in ${bt}longq7${rt}."
     echo
     echo -e "  Maximum time limits of (CPU) queues as of ${da[1]} ${da[2]}, ${da[5]}:"
-    echo -e "  ${he}queue         time limit        priority level(1=highest)${rt}"
-    echo -e "  ${bt}debug${rt}           1:00:00               1"
-    echo -e "  ${bt}shortq7${rt}         6:00:00               2"
-    echo -e "  ${bt}mediumq7${rt}       72:00:00               3"
-    echo -e "  ${bt}longq7${rt}        168:00:00               4"
+    echo -e "  ${he}queue         time limit        priority level        symbol${rt}"
+    echo -e "  ${bt}debug${rt}           1:00:00               4                 ${bt}d${rt}"                            
+    echo -e "  ${bt}shortq7${rt}         6:00:00               3                 ${bt}s${rt}"
+    echo -e "  ${bt}mediumq7${rt}       72:00:00               2                 ${bt}m${rt}"
+    echo -e "  ${bt}longq7${rt}        168:00:00               1                 ${bt}l${rt}"
+    echo -e "  Here 4 is highest priority and 1 is the lowest."
+    echo -e "  The symbols are for reference in table for ${pa}constraint${rt} info below."
     echo
     echo -e "  For more details, check:"
     echo -e "  https://helpdesk.fau.edu/TDClient/2061/Portal/KB/ArticleDet?ID=141348"
@@ -153,18 +158,72 @@ for ${pa}nodes${rt}"
     echo -e "${pa}constraint${rt}: constraint to request specific targeted node"
     echo -e "  This is can be the specific constraint for a node type (listed below),"
     echo -e "  or a general constraint specification of ${bt}epyc${rt} or ${bt}amd${rt}"
-    echo -e "  or ${bt}intel${rt} or ${bt}ib${rt} or blank specification as ${bt}""${rt}."
+    echo -e "  or ${bt}intel${rt} or ${bt}ib${rt} or blank specification as ${bt}\"\"${rt}."
     echo -e "  ${he}Note${rt}: Specifications ${bt}all${rt} option for ${pa}ppn${rt} and ${bt}auto${rt} for ${pa}ppn${rt} and ${pa}tpn${rt}"
     echo -e "        depend on the ${pa}constraint${rt} specified as that decides"
     echo -e "        the maximum procs on node for the specific node type."
     echo -e "        For general ${pa}constraint${rt} ${bt}epyc${rt} or ${bt}amd${rt} this maximum is 64,"
-    echo -e "        while for ${bt}intel${rt} or ${bt}ib${rt} or ${bt}""${rt} this is 20."
+    echo -e "        while for ${bt}intel${rt} or ${bt}ib${rt} or ${bt}\"\"${rt} this is 20."
     echo
-    echo -e "  List of nodes and their constraints and specs as of ${da[1]} ${da[1]}, ${da[5]}:"
-    echo -e "${pa}njobs${rt}  :"
-    echo -e "${pa}jobname${rt} : "
-    echo -e "${pa}command${rt} :"
-    echo -e "${pa}parfile (optional)${rt}:"
+    echo -e "  List of nodes and their constraints and specs as of ${da[1]} ${da[2]}, ${da[5]}:"
+    echo -e "  ${he}nodes                                    count procs memory weight constraint queues${rt}"
+    echo -e "  nodeamd[002-008]                            7    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt}"
+    echo -e "  nodeamd[009-016]                            8    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
+    echo -e "  nodeamd[017-029,031,033-035,037,038]       19   256     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt},${bt}s${rt}"
+    echo -e "  nodeamd[030,032]                            2   256     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt}"
+    echo -e "  nodeamd036                                  1   128     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt},${bt}s${rt}"
+    echo -e "  nodeamd[039-041]                            3    96   125G    100   ${bt}epyc74f3${rt}  ${bt}d${rt},${bt}s${rt}"
+    echo -e "  nodeamd[042-044]                            3    96   125G    100   ${bt}epyc74f3${rt}  ${bt}d${rt}"
+    echo -e "  node[052-054,056,058-068,071-082,087-098]  41    20   110G     50   ${bt}e52660${rt}      ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
+    echo -e "  nodenviv[100001-100016]                    16    64   180G    100   ${bt}xeon6130${rt}    ${bt}s${rt}"
+    echo -e "  nodegpu001                                  1    40    50G     95   ${bt}e52660${rt}      ${bt}s${rt}"
+    echo -e "  nodeeng[001-003]                            3    40   256G     80   ${bt}e2680${rt}       ${bt}s${rt}"
+    echo -e "  nodeeng[004-006,009]                        3    32   256G     80   ${bt}e2680${rt}       ${bt}s${rt}"
+    echo -e "  The 'weight' determines priority, with higher number being higher priority."
+    echo
+    echo -e "  Some of this info can be found on page:"
+    echo -e "  https://helpdesk.fau.edu/TDClient/2061/Portal/KB/ArticleDet?ID=142380"
+    echo -e "  However this is not all up to date."
+    echo -e "  To get exact current details and status of nodes use command:"
+    echo -e "  ${bt}sinfo -Nl${rt}"
+    echo -e "  To get exact current details of idle nodes use command:"
+    echo -e "  ${bt}sinfo -Nl -t idle${rt}"
+    echo
+    echo -e "${pa}njobs${rt}: number of consecutive jobs to submit"
+    echo -e "  This can be a number, but can also be followed by a job ID separated by a ':'."
+    echo -e "  In case an ID is provided, the submitted jobs will start after the job with"
+    echo -e "  the specified ID finishes."
+    echo
+    echo -e "${pa}jobname${rt}: name of the job"
+    echo -e "  This can simply be the par file name, unless end ${pa}parfile${rt} option is specified."
+    echo
+    echo -e "${pa}command${rt}: command or executable for the job"
+    echo -e "  In case of executable, it is better to provide full path here or symbolic link."
+    echo
+    echo -e "${pa}parfile (optional)${rt}: name of parfile"
+    echo -e "  This is optional and can be left blank if par file is specified in \
+${pa}jobname${rt}."
+    echo
+    echo -e "${he}EXAMPLES:${rt}"
+    echo -e "Get 2 epyc7551 nodes with all MPI procs in long queue with max time using"
+    echo -e "nmesh for 2 jobs:"
+    echo -e "${bt}qjob 2 all auto max longq7 epyc7551 2 name.par /home/usr/nmesh/exe/nmesh${rt}"
+    echo
+    echo -e "Get 4 epyc7702 nodes with 4 OpenMP threads using all CPUs in short queue for"
+    echo -e "10 jobs following job 14824702:"
+    echo -e "${bt}qjob 4 all 4 max shortq7 epyc7702 10:14824702 name.par /home/usr/nmesh/exe/nmesh${rt}"
+    echo
+    echo -e "Run sgrid on haswell(e52660) node using all CPUS for threads on"
+    echo -e "long queue for 2 jobs:"
+    echo -e "${bt}qjob serial auto auto max longq7 e52660 2 name.par /home/usr/sgrid/exe/sgrid${rt}"
+    echo -e "or"
+    echo -e "${bt}qjob serial auto auto max longq7 haswell 2 name.par /home/usr/sgrid/exe/sgrid${rt}"
+    echo
+    echo -e "Run bam on 2 epyc7702 nodes using 64 MPI procs in short queue for 5 jobs:"
+    echo -e "${bt}qjob 2 64 auto max shortq7 epyc7702 5 name.par \"/home/usr/bam/exe/bam -nt 4\"${rt}"
+    echo
+    echo -e "Run nmesh on 1 epyc7702 node using 220 MPI procs in short queue for 4.5 hours:"
+    echo -e "${bt}qjob 1 220 1 4:30:00 shortq7 epyc7702 1 name.par /home/usr/nmesh/exe/nmesh${rt}"
   else
     export mode=$1
     export nodes=$1
@@ -241,18 +300,15 @@ for ${pa}nodes${rt}"
     elif [ C$constraint = Cepyc74f3 ]
     then
       tpn_max=96
-    elif [ C$constraint = Cepyc7282 ]
-    then
-      tpn_max=
     elif [ C$constraint = Cxeon613 ]
     then
       tpn_max=64
     elif [ C$constraint = Ce52660 ]
     then
       tpn_max=40
-    elif [ C$constraint = Ce52660 ]
+    elif [ C$constraint = Ce2680 ]
     then
-      tpn_max=
+      tpn_max=40
     fi
     # there should be more constraints...
 
@@ -330,19 +386,19 @@ for ${pa}nodes${rt}"
     while [ $i -le $njobs ];
     do
       QSUB="sbatch -t $walltime \
-                   --nodes=$nodes --exclusive \
-                   --ntasks=$procs \
-                   --cpus-per-task=$OMP_NUM_THREADS \
-                   --mem=0 \
-                   -A $account \
-                   -J $jobname \
-                   -p $queue \
-                   -o $parfile.o%J"
+--nodes=$nodes --exclusive \
+--ntasks=$procs \
+--cpus-per-task=$OMP_NUM_THREADS \
+--mem=0 \
+-A $account \
+-J $jobname \
+-p $queue \
+-o $parfile.o%J"
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
         QSUB2=""
       else
-        QSUB2="      -d afterany:$LASTJOBID"
+        QSUB2=" -d afterany:$LASTJOBID"
       fi
       QSUB="$QSUB$QSUB2"
 
@@ -350,19 +406,19 @@ for ${pa}nodes${rt}"
       then
         QSUB2=""
       else
-        QSUB2="      -C $constraint"
+        QSUB2=" -C $constraint"
       fi
       QSUB="$QSUB$QSUB2"
 
       QSUB="$QSUB \
-            $HOME/bin/slurm_mpirun_script"
+            $HOME/bin/qjob_script"
       export QSUB
       echo
       echo -e "calling sbatch:"
-      echo -e $QSUB | tee -a $jobname.last-sbatch
+      echo -e $QSUB | tee -a $jobname.sbatch
       # execute qsub and save output also in $jobname.last-sbatch
       $QSUB | tee -a $jobname.last-sbatch
-      LASTJOBID=`tail -n1 $jobname.last-sbatch | awk '{ print $NF }'`
+      LASTJOBID=`tail -n1 $jobname.sbatch | awk '{ print $NF }'`
 
       let i=i+1
     done    # end of while loop
