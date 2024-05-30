@@ -69,8 +69,7 @@ da=($d)
 #############
 # for KOKO: #
 #############
-#if [[ $HOSTNAME =~ koko-login ]]
-if [[ $HOSTNAME =~ saturn ]]
+if [[ $HOSTNAME =~ koko-login ]]
 then
 
   if [ -z $1 ]
@@ -394,6 +393,7 @@ ${pa}jobname${rt}."
 -J $jobname \
 -p $queue \
 -o $parfile.o%J"
+      echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
         QSUB2=""
@@ -417,7 +417,7 @@ ${pa}jobname${rt}."
       echo -e "calling sbatch:"
       echo -e $QSUB | tee -a $jobname.sbatch
       # execute qsub and save output also in $jobname.last-sbatch
-      $QSUB | tee -a $jobname.last-sbatch
+      $QSUB | tee -a $jobname.sbatch
       LASTJOBID=`tail -n1 $jobname.sbatch | awk '{ print $NF }'`
 
       let i=i+1
