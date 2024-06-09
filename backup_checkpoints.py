@@ -121,7 +121,7 @@ na   = len(args)
 if na == 0:
   
   print("Usage:")
-  print("switch_chckpt.py path n_previous_checkpoint")
+  print("backup_checkpoints.py path n_previous_checkpoint")
   print("path: path of run output directory")
   print("n_previous_checkpoint: how many previous checkpoints to keep")
   # print()
