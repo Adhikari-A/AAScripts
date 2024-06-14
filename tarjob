@@ -1,0 +1,39 @@
+#!/bin/bash
+
+echo "==============================================================="
+echo "tarjob"
+echo "==============================================================="
+
+export dir=$1
+
+if [ -z "$dir" ]
+then
+  echo "Usage:"
+  echo "tarjob dir"
+  echo
+  echo "dir: Directory to be compressed into tar ball."
+  echo "     Must have 'dir' in current working directory path."
+else
+  export XZ_OPT=-9
+  echo "XZ_OPT = $XZ_OPT"
+  export tarcommand="tar cJf $dir.txz $dir --remove-files -v"
+  echo "tar command:"
+  echo $tarcommand | tee -a $dir.submission
+  echo
+  
+  export slurmcommand="sbatch -t 168:00:00 \
+                      --nodes=1 --exclusive \
+                     --cpus-per-task=1 \
+                     -A dummyaccount \
+                     -o tar_$dir.o%J \
+                     -J tar_$dir \
+                     -p longq7 \
+                     $HOME/bin/tar_sbatch_script"
+  echo "calling sbatch:"
+  echo $slurmcommand | tee -a $dir.submission
+  $slurmcommand | tee -a $dir.submission
+fi
+
+echo "==============================================================="
+echo "Exiting script."
+echo "==============================================================="
