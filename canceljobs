@@ -3,29 +3,30 @@
 echo ""
 echo "canceljobs"
 echo ""
-export job=$1
-export n=$2
+export first_ID=$1
+export last_ID=$2
 export command="scancel"
 export list=""
-if [ -z "${job}" ]
+if [ -z "${first_ID}" ]
 then
   echo "usage:"
-  echo "canceljobs jobID n"
-  echo "	       | |"
-  echo "	       | number of jobs to be canceled"
+  echo "canceljobs jobID_first jobID_last"
+  echo "	       |          |"
+  echo "	       |       job ID of the last job (i.e, highest number)"
+  echo "               |       in the consecutive list of jobs to be canceled"
   echo "	       |"
-  echo "	      job ID of the first job in the list to be canceled"
+  echo "	      job ID of the first job (i.e, lowest number)"
+  echo "              in the consecutive list of jobs to be canceled"
   echo "" 
 else
-  for (( i=0; i<n; i++ ))
+  for (( i=first_ID; i<=last_ID; i++ ))
   do
-    list+=" ${job}"
-    ((job=job+1))
+    list="$list $i"
   done
   echo "jobs to be cancelled:"
   echo $list
   echo ""
-  command+=" $list"
+  command+="$list"
   echo "putting in 'scancel' command:"
   echo $command
   echo ""
