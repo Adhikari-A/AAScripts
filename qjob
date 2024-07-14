@@ -535,7 +535,7 @@ ${pa}jobname${rt}."
     echo -e "${he}EXAMPLES:${rt}"
     echo -e 
     echo -e 
-
+  fi
 
 #####################
 # for unknown host: #
