@@ -69,7 +69,8 @@ da=($d)
 #############
 # for KOKO: #
 #############
-if [[ $HOSTNAME =~ koko-login ]]
+# if [[ $HOSTNAME =~ koko-login ]] -> this does not work in compute nodes
+if [[ $HOSTNAME =~ hpc.fau.edu ]]
 then
 
   if [ -z $1 ]
