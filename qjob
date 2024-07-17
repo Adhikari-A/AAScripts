@@ -69,8 +69,10 @@ da=($d)
 #############
 # for KOKO: #
 #############
-# if [[ $HOSTNAME =~ koko-login ]] -> this does not work in compute nodes
-if [[ "$HOSTNAME" =~ "hpc.fau.edu" ]]
+# if [[ "$HOSTNAME" =~ "hpc.fau.edu" ]] -> this works on compute nodes
+# But, jobs submitted from compute node do not always start properly
+# due to some missing stuff, so better to stick with the one below.
+if [[ $HOSTNAME =~ koko-login ]] # -> this does not work on compute nodes
 then
 
   if [ -z $1 ]
@@ -143,7 +145,7 @@ for ${pa}nodes${rt}"
     echo -e "  Check ${pa}constraint${rt} info below for which node can be run on which queue."
     echo -e "  ${he}Note${rt}: Sgrid runs should be put in ${bt}longq7${rt}."
     echo
-    echo -e "  Maximum time limits of (CPU) queues as of ${da[1]} ${da[2]}, ${da[5]}:"
+    echo -e "  Maximum time limits of (CPU) queues as of July 17, 2024:"
     echo -e "  ${he}queue         time limit        priority level        symbol${rt}"
     echo -e "  ${bt}debug${rt}           1:00:00               4                 ${bt}d${rt}"                            
     echo -e "  ${bt}shortq7${rt}         6:00:00               3                 ${bt}s${rt}"
@@ -165,7 +167,7 @@ for ${pa}nodes${rt}"
     echo -e "        For general ${pa}constraint${rt} ${bt}epyc${rt} or ${bt}amd${rt} this maximum is 64,"
     echo -e "        while for ${bt}intel${rt} or ${bt}ib${rt} or ${bt}\"\"${rt} this is 20."
     echo
-    echo -e "  List of nodes and their constraints and specs as of ${da[1]} ${da[2]}, ${da[5]}:"
+    echo -e "  List of nodes and their constraints and specs as of July 17, 2024:"
     echo -e "  ${he}nodes                                    count procs memory weight constraint queues${rt}"
     echo -e "  nodeamd[002-008]                            7    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt}"
     echo -e "  nodeamd[009-016]                            8    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
@@ -439,13 +441,13 @@ then
   if [ -z $1 ]
   then
     echo -e "${he}USAGE:${rt}"
-    echo -e "${bt}submitjob${rt} nodes ppn tpn walltime queue njobs jobname command [parfile]${rt}"
+    echo -e "${bt}submitjob${rt} ${pa}nodes ppn tpn walltime queue njobs jobname command [parfile]${rt}"
     echo -e "          |     |   |    |        |    ${pa}njobs${rt}=1,2,3,...:DependOnID   "
     echo -e "          |     |   |    |       ${pa}queue${rt}=${bt}wholenode${rt},${bt}wide${rt},${bt}shared${rt},${bt}debug${rt}"
     echo -e "          |     |   |   ${pa}walltime${rt}=2:00:00,12:00:00,96:00:00;${bt}max${rt}"
     echo -e "          |     |  ${pa}tpn${rt}=1,2,3,.....;${bt}auto${rt} [OMP thread/MPI proc]"
     echo -e "          |    ${pa}ppn${rt}=1,2,3....128;all;${bt}auto${rt} [MPI proc/node]"
-    echo -e "          ${pa}nodes${rt}=1,2,..;serial${rt}"
+    echo -e "          ${pa}nodes${rt}=1,2,..;${bt}serial${rt}"
     echo
     echo -e "For detailed info, use:"
     echo -e "${bt}qjob -h${rt}"
@@ -468,6 +470,7 @@ ${bt}qjob_script${rt}"
     echo -e "  This can be a number (for MPI based jobs usually)"
     echo -e "  or it could ${bt}serial${rt} to use only one proc (MPI) in one node"
     echo -e "  possibly with threads (usually OpenMP)."
+    echo -e "  For max number nodes allowed for each partition, check ${pa}queue${rt} info below."
     echo
     echo -e "${pa}ppn${rt}: processes (usually MPI) per node"
     echo -e "  This can be a number within the maximum processes permitted for node type"
@@ -505,19 +508,20 @@ for ${pa}nodes${rt}"
     echo -e "  Check ${pa}constraint${rt} info below for which node can be run on which queue."
     echo -e "  ${he}Note${rt}: Sgrid runs should be put in ${bt}longq7${rt}."
     echo
-    echo -e "  Maximum time limits of (CPU) queues as of ${da[1]} ${da[2]}, ${da[5]}:"
-    echo -e "  ${he}queue         time limit${rt}"
-    echo -e "  ${bt}debug${rt}          2:00:00"
-    echo -e "  ${bt}wide${rt}          12:00:00"
-    echo -e "  ${bt}wholenode${rt}     96:00:00"
-    echo -e "  ${bt}shared${rt}        96:00:00"
+    echo -e "  Maximum time limits of (CPU) queues as of July 17, 2024:"
+    echo -e "  ${he}queue         time limit    max nodes/job${rt}"
+    echo -e "  ${bt}debug${rt}          2:00:00         2"
+    echo -e "  ${bt}wide${rt}          12:00:00        56"
+    echo -e "  ${bt}wholenode${rt}     96:00:00        16"
+    echo -e "  ${bt}shared${rt}        96:00:00         1"
     echo
     echo -e "  For more details, check:"
     echo -e "  https://www.rcac.purdue.edu/knowledge/anvil/run/partitions"
     echo
     echo -e "  For summary of current status of nodes on partitions, use command:"
     echo -e "  ${bt}showpartitions${rt}"
-   echo -e "${pa}njobs${rt}: number of consecutive jobs to submit"
+    echo
+    echo -e "${pa}njobs${rt}: number of consecutive jobs to submit"
     echo -e "  This can be a number, but can also be followed by a job ID separated by a ':'."
     echo -e "  In case an ID is provided, the submitted jobs will start after the job with"
     echo -e "  the specified ID finishes."
@@ -533,7 +537,7 @@ for ${pa}nodes${rt}"
 ${pa}jobname${rt}."
     echo
     echo -e "${he}EXAMPLES:${rt}"
-    echo -e 
+    echo -e "Use 26 nodes in wide queue"
     echo -e 
   fi
 
