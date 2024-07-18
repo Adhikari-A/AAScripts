@@ -454,11 +454,10 @@ then
   elif [ $1 = -h ]
   then
     echo -e "${he}USAGE:${rt}"
-    echo -e "${bt}submitjob${rt} nodes ppn tpn walltime queue njobs jobname command [parfile]${rt}"
+    echo -e "${bt}submitjob${rt} ${bt}nodes ppn tpn walltime queue njobs jobname command [parfile]${rt}"
     echo
-    echo -e "${he}NOTE${rt}: ${bt}qjob${rt} only works if you have placed the associated file \
-${bt}qjob_script${rt}"
-    echo -e "      inside the directory: ${bt}~/bin/${rt}."
+    echo -e "${he}NOTE${rt}: ${bt}qjob${rt} only works if you have placed the associated file"
+    echo -e "      ${bt}qjob_script${rt} inside the directory: ${bt}~/bin/${rt}."
     echo -e "      If you do not have this directory,"
     echo -e "      please create it and put the file there."
     echo
@@ -470,7 +469,8 @@ ${bt}qjob_script${rt}"
     echo -e "  This can be a number (for MPI based jobs usually)"
     echo -e "  or it could ${bt}serial${rt} to use only one proc (MPI) in one node"
     echo -e "  possibly with threads (usually OpenMP)."
-    echo -e "  For max number nodes allowed for each partition, check ${pa}queue${rt} info below."
+    echo -e "  For max number nodes allowed for each partition,"
+    echo -e "  check ${pa}queue${rt} info below."
     echo
     echo -e "${pa}ppn${rt}: processes (usually MPI) per node"
     echo -e "  This can be a number within the maximum processes permitted for node type"
@@ -525,6 +525,7 @@ for ${pa}nodes${rt}"
     echo -e "  This can be a number, but can also be followed by a job ID separated by a ':'."
     echo -e "  In case an ID is provided, the submitted jobs will start after the job with"
     echo -e "  the specified ID finishes."
+    echo -e "  Max number of consecutive jobs that can be submitted: 10 (!!VERIFY!!)"
     echo
     echo -e "${pa}jobname${rt}: name of the job"
     echo -e "  This can simply be the par file name, unless end ${pa}parfile${rt} option is specified."
@@ -537,8 +538,166 @@ for ${pa}nodes${rt}"
 ${pa}jobname${rt}."
     echo
     echo -e "${he}EXAMPLES:${rt}"
-    echo -e "Use 26 nodes in wide queue"
-    echo -e 
+    echo -e "Use 39 nodes in wide queue for full duration for 5 consecutive jobs:"
+    echo -e "${bt}qjob 39 all auto max wide 5 name.par nmesh${rt}"
+    echo
+    echo -e "Use 13 nodes in wholenode queue for full duration:"
+    echo -e "${bt}qjob 13 all auto max wholenode 1 name.par nmesh${rt}"
+  else
+    export mode=$1
+    export nodes=$1
+    # if [ $mode = serial ]
+    # then
+    #   export nodes=1
+    # fi
+    export ppn=$2
+    export ppn_mode=$2
+    export tpn=$3
+    export tpn_mode=$3
+    export memory=""
+    export walltime=$4
+    export queue=$5
+    #export constraint=$5
+    export njobs=`echo $6 | awk --field-separator ':' '{ print $1 }'`
+    export DependOnID=`echo $6 | awk --field-separator ':' '{ print $2 }'`
+    # export account=$6
+    export account="dummyaccount"
+    export jobname=$7
+    export command=$8
+    export parfile=$9
+
+    if [ -z "${parfile}" ]
+    then
+      export parfile=$jobname
+    fi
+
+    if [ $walltime = max ]
+    then
+      if [ $queue = debug ]
+      then
+        export walltime='2:00:00'
+      elif [ $queue = wide ]
+      then
+        export walltime='12:00:00'
+      elif [ $queue = wholenode ]
+      then
+        export walltime='96:00:00'
+      elif [ $queue = shared ]
+      then
+        export walltime='96:00:00'
+      else
+        echo "Unknown queue spec."
+        export walltime=''
+      fi
+    fi
+    
+    # set tpn max
+     tpn_max=128
+ 
+    # set ppn properly
+    if [ $mode = serial ] # only can use 1 node with 1 proc in serial mode
+    then
+      export nodes=1
+      export ppn=1
+    elif [ $ppn_mode = all ] # use all cores per node for MPI procs
+    then
+      let ppn=tpn_max
+      export ppn
+    elif [ $ppn_mode = auto ] # set ppn appropriately if tpn is specified, using max cpus p
+    then
+      let ppn=tpn_max/tpn
+      export ppn
+    fi
+
+    # set tpn correctly 
+    if  [ $tpn_mode = auto ] # set tpn appropriately if ppn is specified, using max cpus pe
+    then
+      let tpn=tpn_max/ppn
+      export tpn
+    elif [ $ppn_mode = all ] && [ $mode != serial ] # use all cores per node for MPI, so 1 
+    then
+      export tpn=1
+    fi
+
+    # set total numbers of MPI procs correctly
+    let procs=nodes*ppn
+    export procs
+
+    # compute OMP_NUM_THREADS for OpenMP
+    # let OMP_NUM_THREADS=tpn/ppn
+    let OMP_NUM_THREADS=tpn
+    export OMP_NUM_THREADS
+
+    if [ $mode = serial ]
+    then
+      export MPIRUN="$command $parfile"
+    else
+      # export MPIRUN="mpirun -np $procs $command $parfile"
+      export MPIRUN="srun -n $procs $command $parfile"
+    fi
+
+    # these two can be used to have more MPI tags with Intel's MPI
+    # sum of TAG_BITS and RANK_BITS has to be 39, e.g. 30+9:
+    export MPIR_CVAR_CH4_OFI_TAG_BITS
+    export MPIR_CVAR_CH4_OFI_RANK_BITS
+
+    echo "HOSTNAME = $HOSTNAME , i.e. ANVIL"
+    echo "nodes = $nodes"
+    echo "ppn = $ppn"
+    echo "tpn = $tpn"
+    echo "procs = $procs"
+    echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"
+    echo "walltime = $walltime"
+    echo "queue = $queue"
+    #echo "constraint = $constraint"
+    echo "njobs = $njobs"
+    echo "account = $account"
+    echo "jobname = $jobname"
+    echo "command = $command"
+    echo "parfile = $parfile"
+    echo
+    echo "MPIRUN = $MPIRUN"
+
+    if [ -z "${DependOnID}" ]
+    then
+      LASTJOBID=ThereIsNoJobToDependOn
+    else
+      LASTJOBID=$DependOnID
+    fi
+    i=1
+    while [ $i -le $njobs ];
+    do
+      QSUB="sbatch -t $walltime \
+--nodes=$nodes \
+--ntasks=$procs \
+--cpus-per-task=$OMP_NUM_THREADS \
+-J $jobname \
+-p $queue \
+-o $parfile.o%J"
+#--exclusive \
+#-A $account"
+      if [ $LASTJOBID = ThereIsNoJobToDependOn ];
+      then
+        QSUB2=""
+      else
+        QSUB2=" -d afterany:$LASTJOBID"
+      fi
+      QSUB="$QSUB$QSUB2"
+
+      QSUB="$QSUB \
+            $HOME/bin/qjob_script"
+      export QSUB
+      echo
+      echo "calling sbatch:"
+      echo $QSUB | tee -a $jobname.sbatch
+      # execute qsub and save output also in $jobname.last-sbatch
+      $QSUB | tee -a $jobname.sbatch
+      LASTJOBID=`tail -n1 $jobname.sbatch | awk '{ print $NF }'`
+ 
+      let i=i+1
+    done    # end of while loop
+
+
   fi
 
 #####################
