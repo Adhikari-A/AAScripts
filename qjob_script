@@ -29,9 +29,14 @@ echo
 echo "MPIBOOT = $MPIBOOT"
 echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Info about OpenMP and Slurm environment variable:"
 echo
-echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"
+env | grep SLURM_
 echo
+env | grep OMP_
+#echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "sbatch command:"
 echo "$QSUB"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"

@@ -189,11 +189,11 @@ for ${pa}nodes${rt}"
     echo -e "  To get exact current details and status of nodes use command:"
     echo -e "  ${bt}sinfo -Nl${rt}"
     echo -e "  or"
-    echo -e "  ${bt}sinfo -N -o \"%11N %11P %10T %4c %7z %8m %10l %2D %30b\"${rt}"
+    echo -e "  ${bt}sinfo -N -o \"%15N %11P %10T %4c %7z %8m %10l %2D %30b\"${rt}"
     echo -e "  To get exact current details of idle nodes use command:"
     echo -e "  ${bt}sinfo -Nl -t idle${rt}"
     echo -e "  or"
-    echo -e "  ${bt}sinfo -N -o \"%11N %11P %10T %4c %7z %8m %10l %2D %30b\" -t idle${rt}"
+    echo -e "  ${bt}sinfo -N -o \"%15N %11P %10T %4c %7z %8m %10l %2D %30b\" -t idle${rt}"
     echo
     echo -e "${pa}njobs${rt}: number of consecutive jobs to submit"
     echo -e "  This can be a number, but can also be followed by a job ID separated by a ':'."
@@ -350,13 +350,27 @@ ${pa}jobname${rt}."
     # compute OMP_NUM_THREADS for OpenMP
     let OMP_NUM_THREADS=tpn
     export OMP_NUM_THREADS
+    # options from Quent to set threads properly
+    export OMP_PLACES=SOCKETS
+    export OMP_DISPLAY_ENV=TRUE
+    export OMP_DISPLAY_AFFINITY=TRUE 
  
     if [ $mode = serial ]
     then
       export MPIRUN="$command $parfile"
     else
+      # old way of running before prun was suggested:
       # export MPIRUN="mpirun -np $procs $command $parfile"
-      export MPIRUN="prun $command $parfile"
+      
+      # deprecating prun, as it runs basically mpirun with
+      # defaults which does not go nice with threads:
+      # export MPIRUN="prun $command $parfile"
+      
+      # set mpirun properly: no need for -np as it looks
+      # at SLURM variable and sets number of procs
+       export MPIRUN="mpirun -report-bindings --display-allocation \
+--display-map --map-by socket $command $parfile"
+      
     fi
 
     # these two can be used to have more MPI tags with Intel's MPI
