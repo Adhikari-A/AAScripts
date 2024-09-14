@@ -114,7 +114,8 @@ else:
         logfiles = []
         # getting logfiles for current par file
         for file in all_files:
-          if file.startswith(par_file+'.o'):  logfiles.append(file)
+          if file.startswith(par_file+'.o') or file.startswith(par_file+'.20'):
+            logfiles.append(file)
         
         if not mv_a:  logfiles = logfiles[:-1]
         
