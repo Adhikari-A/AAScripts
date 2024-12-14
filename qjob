@@ -648,7 +648,7 @@ ${pa}jobname${rt}."
     export queue=$5
     # export constraint=$6
     export constraint=$(echo -e $6 | awk --field-separator ':' '{ print $1 }')
-    export hboi=$(echo -e $6 | awk --field-separator ':' '{ print $2 }')
+    export zentype=$(echo -e $6 | awk --field-separator ':' '{ print $2 }')
     export njobs=$(echo -e $7 | awk --field-separator ':' '{ print $1 }')
     export DependOnID=$(echo -e $7 | awk --field-separator ':' '{ print $2 }')
     # export account=$7
@@ -698,7 +698,7 @@ ${pa}jobname${rt}."
     if [ C$constraint = Cepyc7702 ]
     then
       tpn_max=256
-    elif [ C$constraint = Czen ] && [ -n "$hboi" ]
+    elif [ C$constraint = Czen ] && [ C$zentype = Chboi ]
     then
       tpn_max=128
     # elif [ C$constraint = Cepyc7551 ]
@@ -981,8 +981,8 @@ ${pa}jobname${rt}."
     export walltime=$4
     export queue=$5
     #export constraint=$5
-    export njobs=`echo $6 | awk --field-separator ':' '{ print $1 }'`
-    export DependOnID=`echo $6 | awk --field-separator ':' '{ print $2 }'`
+    export njobs=$(echo $6 | awk --field-separator ':' '{ print $1 }')
+    export DependOnID=$(echo $6 | awk --field-separator ':' '{ print $2 }')
     # export account=$6
     export account="dummyaccount"
     export jobname=$7
@@ -1115,7 +1115,7 @@ ${pa}jobname${rt}."
       echo $QSUB | tee -a $jobname.sbatch
       # execute qsub and save output also in $jobname.last-sbatch
       $QSUB | tee -a $jobname.sbatch
-      LASTJOBID=`tail -n1 $jobname.sbatch | awk '{ print $NF }'`
+      LASTJOBID=$(tail -n1 $jobname.sbatch | awk '{ print $NF }')
  
       let i=i+1
     done    # end of while loop
