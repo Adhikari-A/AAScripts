@@ -105,10 +105,10 @@ class Box:
 
     if self.verbose:
       print(f"H-refinement level of box centered at"
-            f"({self.x0}, {self.y0}, {self.z0}),: {self.l}")
+            f"({self.x0}, {self.y0}, {self.z0}): {self.l}")
       print(f"Extent of box in each direction:"
-            f"[{-self.xl},{self.xu}],[{-self.yl},{self.yu}],"
-            f"[{-self.yl},{self.yu}]\n")
+            f"[{self.xl},{self.xu}],[{self.yl},{self.yu}],"
+            f"[{self.yl},{self.yu}]\n")
 
   def get_shifted_origin(self) -> None:
     """

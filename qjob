@@ -17,9 +17,10 @@ export MPIBOOT=""
 export MPIHALT=""
 export OMP_NUM_THREADS=""
 
-export hostname=`hostname -d`
+# export hostname=`hostname -d`
+export hostname=$(hostname -d)
 
-# Save the current IFS value
+# Save the current IFS value export hostname=`hostname -d`
 OLD_IFS=$IFS
 
 if command -v dircolors &> /dev/null; 
@@ -106,7 +107,7 @@ ${bt}qjob_script${rt}"
     echo -e "${he}OPTIONS:${rt}"
     echo -e "${pa}nodes${rt}: total number of nodes for job"
     echo -e "  This can be a number (for MPI based jobs usually)"
-    echo -e "  or it could ${bt}serial${rt} to use only one proc (MPI) in one node"
+    echo -e "  or it could be ${bt}serial${rt} to use only one proc (MPI) in one node"
     echo -e "  possibly with threads (usually OpenMP)."
     echo
     echo -e "${pa}ppn${rt}: processes (usually MPI) per node"
@@ -168,6 +169,7 @@ for ${pa}nodes${rt}"
     echo -e "        while for ${bt}intel${rt} or ${bt}ib${rt} or ${bt}\"\"${rt} this is 20."
     echo
     echo -e "  List of nodes and their constraints and specs as of July 17, 2024:"
+    echo
     echo -e "  ${he}nodes                                    count procs memory weight constraint queues${rt}"
     echo -e "  nodeamd[002-008]                            7    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt}"
     echo -e "  nodeamd[009-016]                            8    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
@@ -181,6 +183,7 @@ for ${pa}nodes${rt}"
     echo -e "  nodegpu001                                  1    40    50G     95   ${bt}e52660${rt}      ${bt}s${rt}"
     echo -e "  nodeeng[001-003]                            3    40   256G     80   ${bt}e2680${rt}       ${bt}s${rt}"
     echo -e "  nodeeng[004-006,009]                        3    32   256G     80   ${bt}e2680${rt}       ${bt}s${rt}"
+    echo
     echo -e "  The 'weight' determines priority, with higher number being higher priority."
     echo
     echo -e "  Some of this info can be found on page:"
@@ -245,8 +248,8 @@ ${pa}jobname${rt}."
     export walltime=$4
     export queue=$5
     export constraint=$6
-    export njobs=`echo -e $7 | awk --field-separator ':' '{ print $1 }'`
-    export DependOnID=`echo -e $7 | awk --field-separator ':' '{ print $2 }'`
+    export njobs=$(echo -e $7 | awk --field-separator ':' '{ print $1 }')
+    export DependOnID=$(echo -e $7 | awk --field-separator ':' '{ print $2 }')
     # export account=$7
     export account="dummyaccount"
     export jobname=$8
@@ -439,12 +442,418 @@ ${pa}jobname${rt}."
       echo -e $QSUB | tee -a $jobname.sbatch
       # execute qsub and save output also in $jobname.last-sbatch
       $QSUB | tee -a $jobname.sbatch
-      LASTJOBID=`tail -n1 $jobname.sbatch | awk '{ print $NF }'`
+      LASTJOBID=$(tail -n1 $jobname.sbatch | awk '{ print $NF }')
 
       let i=i+1
     done    # end of while loop
  fi
 # End of KOKO
+
+#############
+# for ATHENE: #
+#############
+elif [[ $HOSTNAME =~ rocky-login ]]
+then
+  echo -e "HOSTNAME = $HOSTNAME , i.e. ATHENE"
+  if [ -z $1 ]
+  then
+    echo -e "${he}USAGE:${rt}"
+#    keeping this part commented now as all these features of koko don't yet exist in athene
+#    echo -e "${bt}qjob${rt} ${pa}nodes ppn tpn walltime queue constraint njobs jobname command [parfile]${rt}"
+#    echo -e "     |     |   |     |       |       |       ${pa}njobs${rt}=1,2,3,...:DependOnID   "
+#    echo -e "     |     |   |     |       |    ${pa}constraint${rt}=${bt}\"\"${rt},${bt}intel${rt},${bt}epyc${rt},${bt}haswell${rt},..."
+#    echo -e "     |     |   |     |      ${pa}queue${rt}=${bt}longq7${rt},${bt}shortq7${rt},..."
+#    echo -e "     |     |   |   ${pa}walltime${rt}=6:00:00,36:00:00,72:00:00,168:00:00,...;${bt}max${rt}"
+#    echo -e "     |     |   ${pa}tpn${rt}=1,2,3,.....;${bt}auto${rt}[OMP thread/MPI proc]"
+#    echo -e "     |     ${pa}ppn${rt}=1,2,3....;${bt}all${rt};${bt}auto${rt}[MPI proc/node]"
+#    echo -e "     ${pa}nodes${rt}=1,2,..;${bt}serial${rt}"
+    echo -e "${bt}qjob${rt} ${pa}nodes ppn tpn walltime queue constraint njobs jobname command [parfile]${rt}"
+    echo -e "     |     |   |     |       |       |       ${pa}njobs${rt}=1,2,3,...:DependOnID   "
+    echo -e "     |     |   |     |       |    ${pa}constraint${rt}=${bt}\"\"${rt},${bt}epyc${rt},${bt}epyc7702${rt},${bt}zen${rt}..."
+    echo -e "     |     |   |     |      ${pa}queue${rt}=${bt}debug${rt},${bt}shortq7${rt}"
+    echo -e "     |     |   |   ${pa}walltime${rt}=1:00:00,6:00:00;${bt}max${rt}"
+    echo -e "     |     |   ${pa}tpn${rt}=1,2,3,.....;${bt}auto${rt}[OMP thread/MPI proc]"
+    echo -e "     |     ${pa}ppn${rt}=1,2,3....;${bt}all${rt};${bt}auto${rt}[MPI proc/node]"
+    echo -e "     ${pa}nodes${rt}=1,2,..;${bt}serial${rt}"
+    echo
+    echo -e "For detailed info, use:"
+    echo -e "${bt}qjob -h${rt}"
+  elif [ "$1" = -h ]
+  then
+    echo -e "${he}USAGE:${rt}"
+    echo -e "${bt}qjob${rt} ${pa}nodes ppn tpn walltime queue constraint njobs jobname command [parfile]${rt}"
+    echo
+    echo -e "${he}NOTE${rt}: ${bt}qjob${rt} only works if you have placed the associated file \
+${bt}qjob_script${rt}"
+    echo -e "      inside the directory: ${bt}~/bin/${rt}."
+    echo -e "      If you do not have this directory,"
+    echo -e "      please create it and put the file there."
+    echo
+    echo -e "To replicate the same functioning as ${bt}submitjob${rt}, set ${pa}tpn${rt} to ${bt}auto${rt}."
+    echo -e "The rest remians the same."
+    echo
+    echo -e "${he}OPTIONS:${rt}"
+    echo -e "${pa}nodes${rt}: total number of nodes for job"
+    echo -e "  This can be a number (for MPI based jobs usually)"
+    echo -e "  or it could be ${bt}serial${rt} to use only one proc (MPI) in one node"
+    echo -e "  possibly with threads (usually OpenMP)."
+    echo
+    echo -e "${pa}ppn${rt}: processes (usually MPI) per node"
+    echo -e "  This can be a number within the maximum processes permitted for node type"
+    echo -e "  or it could be ${bt}all${rt} to use all available procs on node as MPI procs"
+    echo -e "  or it could be ${bt}auto${rt} to set this based on ${bt}serial${rt} option \
+for ${pa}nodes${rt}"
+    echo -e "  or ${pa}tpn${rt} as follows:"
+    echo -e "    if      ${pa}node${rt} = ${bt}serial${rt}: ${pa}ppn${rt} = 1"
+    echo -e "    else if ${pa}ppn${rt}  = ${bt}auto${rt}  : ${pa}ppn${rt} = (maximum procs on node)/${pa}tpn${rt}"
+    echo -e "  ${he}Note${rt}: Option ${bt}auto${rt} only works if ${pa}node${rt} is ${bt}serial${rt} or ${pa}tpn${rt} is a number."
+    echo -e "        If ${pa}node${rt} is ${bt}serial${rt}, ${pa}ppn${rt} will be always set to 1,"
+    echo -e "        irrespective of user specification for ${pa}ppn${rt}."
+    echo
+    echo -e "${pa}tpn${rt}: threads (usually OpenMP) per proc (usually MPI)"
+    echo -e "  This can be a number within the maximum processes permitted for node type"
+    echo -e "  or it could be ${bt}auto${rt} to set this based on ${pa}ppn${rt} as follows:"
+    echo -e "    if ${pa}tpn${rt} = ${bt}auto${rt}: ${pa}tpn${rt} = (maximum procs on node)/${pa}ppn${rt}"
+    echo -e "  ${he}Note${rt}: Both ${pa}ppn${rt} and ${pa}tpn${rt} can be set to ${bt}auto${rt} only when ${pa}node${rt} is ${bt}serial${rt}."
+    echo -e "        Otherwise ${pa}tpn${rt} can be ${bt}auto${rt} only when ${pa}ppn${rt} is ${bt}all${rt} or a number."
+    echo -e "        If ${pa}node${rt} is ${bt}serial${rt}, ${pa}ppn${rt} will be always set to 1,"
+    echo -e "        and so if ${pa}tpn${rt} is ${bt}auto${rt} then, it uses all procs on node as threads."
+    echo -e "        If setting both ${pa}ppn${rt} and ${pa}tpn${rt} manually, one has to maintain:"
+    echo -e "          ${pa}ppn${rt} x ${pa}tpn${rt} = maximum procs on node"
+    echo
+    echo -e "${pa}walltime${rt}: time requested on queue for job"
+    echo -e "  This can be a time, within the maximum limit"
+    echo -e "  for the queue(partition) selected, in the format: ${bt}hhh:mm:ss${rt}."
+    echo -e "  This can also be ${bt}max${rt}, which then sets the time to"
+    echo -e "  maximum permitted for the selected queue."
+    echo -e "  Check ${pa}queue${rt} info below for maximum time limits for each queue."
+    echo
+    echo -e "${pa}queue${rt}: queue(partition) selected"
+    echo -e "  As of December 14, 2024, his can be: ${bt}debug${rt} and ${bt}shortq7${rt}."
+    echo -e "  Not all nodes are permitted to run on every queue."
+    echo -e "  Check ${pa}constraint${rt} info below for which node can be run on which queue."
+    echo -e "  ${he}Note${rt}: Sgrid runs should be put in ${bt}longq7${rt} on Koko."
+    echo -e "                  This menas, currently we may not run Sgrid on Athene."
+    echo
+    echo -e "  Maximum time limits of (CPU) queues as of December 14, 2024:"
+    echo -e "  ${he}queue         time limit        priority level        symbol${rt}"
+    echo -e "  ${bt}debug${rt}           1:00:00               2                 ${bt}d${rt}"                            
+    echo -e "  ${bt}shortq7${rt}         6:00:00               1                 ${bt}s${rt}"
+    # echo -e "  ${bt}mediumq7${rt}       72:00:00               2                 ${bt}m${rt}"
+    # echo -e "  ${bt}longq7${rt}        168:00:00               1                 ${bt}l${rt}"
+    echo -e "  Here 2 is highest priority and 1 is the lowest."
+    echo -e "  The symbols are for reference in table for ${pa}constraint${rt} info below."
+    # echo
+    # echo -e "  For more details, check:"
+    # echo -e "  https://helpdesk.fau.edu/TDClient/2061/Portal/KB/ArticleDet?ID=141348"
+    echo
+    echo -e "${pa}constraint${rt}: constraint to request specific targeted node"
+    echo -e "  This is can be the specific constraint for a node type (listed below),"
+    echo -e "  or a general constraint specification of ${bt}epyc${rt} or ${bt}amd${rt}"
+    echo -e "  or ${bt}intel${rt} or ${bt}ib${rt} or blank specification as ${bt}\"\"${rt}."
+    echo -e "  ${he}Note${rt}: Specifications ${bt}all${rt} option for ${pa}ppn${rt} and ${bt}auto${rt} for ${pa}ppn${rt} and ${pa}tpn${rt}"
+    echo -e "        depend on the ${pa}constraint${rt} specified as that decides"
+    echo -e "        the maximum procs on node for the specific node type."
+    echo -e "        For general ${pa}constraint${rt} ${bt}epyc${rt} or ${bt}amd${rt} this maximum is 64,"
+    echo -e "        while for ${bt}intel${rt} or ${bt}ib${rt} or ${bt}\"\"${rt} this is 20."
+    echo
+    echo -e "  List of nodes and their constraints and specs as of December 14, 2024:"
+    ehco
+    # echo -e "  ${he}nodes                                    count procs memory weight constraint queues${rt}"
+    # echo -e "  nodeamd[002-008]                            7    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt}"
+    # echo -e "  nodeamd[009-016]                            8    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
+    # echo -e "  nodeamd[017-029,031,033-035,037,038]       19   256     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt},${bt}s${rt}"
+    # echo -e "  nodeamd[030,032]                            2   256     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt}"
+    # echo -e "  nodeamd036                                  1   128     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt},${bt}s${rt}"
+    # echo -e "  nodeamd[039-041]                            3    96   125G    100   ${bt}epyc74f3${rt}  ${bt}d${rt},${bt}s${rt}"
+    # echo -e "  nodeamd[042-044]                            3    96   125G    100   ${bt}epyc74f3${rt}  ${bt}d${rt}"
+    # echo -e "  node[052-054,056,058-068,071-082,087-098]  41    20   110G     50   ${bt}e52660${rt}      ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
+    # echo -e "  nodenviv[100001-100016]                    16    64   180G    100   ${bt}xeon6130${rt}    ${bt}s${rt}"
+    # echo -e "  nodegpu001                                  1    40    50G     95   ${bt}e52660${rt}      ${bt}s${rt}"
+    # echo -e "  nodeeng[001-003]                            3    40   256G     80   ${bt}e2680${rt}       ${bt}s${rt}"
+    # echo -e "  nodeeng[004-006,009]                        3    32   256G     80   ${bt}e2680${rt}       ${bt}s${rt}"
+    echo -e "  ${he}nodes                 count procs memory weight constraint queues${rt}"
+    echo -e "  nodeamd[018-020]         3   256     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt},${bt}s${rt}"
+    echo -e "  nodegpu[010,026-035]    11    64   128G     95   ${bt}zen${rt}               ${bt}s${rt}"
+    echo -e "  nodehboi[011,012]        2   128   256G     90   ${bt}zen${rt}               ${bt}s${rt}"
+    echo 
+    echo -e "  The 'weight' determines priority, with higher number being higher priority."
+    echo -e "  Since nodegpu and nodehboi both has same constrint, one should distinguish when"
+    echo -e "  using the nodehboi nodes by specifying ${pa}constraint${rt} to ${bt}zen:hboi${rt}."
+    echo
+    # echo -e "  Some of this info can be found on page:"
+    # echo -e "  https://helpdesk.fau.edu/TDClient/2061/Portal/KB/ArticleDet?ID=142380"
+    # echo -e "  However this is not all up to date."
+    echo -e "  To get exact current details and status of nodes use command:"
+    echo -e "  ${bt}sinfo -Nl${rt}"
+    echo -e "  or"
+    echo -e "  ${bt}sinfo -N -o \"%15N %11P %10T %4c %7z %8m %10l %2D %30b\"${rt}"
+    echo -e "  To get exact current details of idle nodes use command:"
+    echo -e "  ${bt}sinfo -Nl -t idle${rt}"
+    echo -e "  or"
+    echo -e "  ${bt}sinfo -N -o \"%15N %11P %10T %4c %7z %8m %10l %2D %30b\" -t idle${rt}"
+    echo
+    echo -e "${pa}njobs${rt}: number of consecutive jobs to submit"
+    echo -e "  This can be a number, but can also be followed by a job ID separated by a ':'."
+    echo -e "  In case an ID is provided, the submitted jobs will start after the job with"
+    echo -e "  the specified ID finishes."
+    echo
+    echo -e "${pa}jobname${rt}: name of the job"
+    echo -e "  This can simply be the par file name, unless end ${pa}parfile${rt} option is specified."
+    echo
+    echo -e "${pa}command${rt}: command or executable for the job"
+    echo -e "  In case of executable, it is better to provide full path here or symbolic link."
+    echo
+    echo -e "${pa}parfile (optional)${rt}: name of parfile"
+    echo -e "  This is optional and can be left blank if par file is specified in \
+${pa}jobname${rt}."
+    echo
+    echo -e "${he}EXAMPLES:${rt}"
+    # echo -e "Get 2 epyc7551 nodes with all MPI procs in long queue with max time using"
+    # echo -e "nmesh for 2 jobs:"
+    # echo -e "${bt}qjob 2 all auto max longq7 epyc7551 2 name.par /home/usr/nmesh/exe/nmesh${rt}"
+    # echo
+    echo -e "Get 2 zen nodes with all MPI procs in short queue with max time using"
+    echo -e "nmesh for 2 jobs:"
+    echo -e "${bt}qjob 2 all auto max shortq7 zen 2 name.par /home/usr/nmesh/exe/nmesh${rt}"
+    echo
+    echo -e "Get 3 epyc7702 nodes with 4 OpenMP threads using all CPUs in short queue for"
+    echo -e "10 jobs following job 14824702:"
+    echo -e "${bt}qjob 3 all 4 max shortq7 epyc7702 10:14824702 name.par /home/usr/nmesh/exe/nmesh${rt}"
+    echo
+    # echo -e "Run sgrid on haswell(e52660) node using all CPUS for threads on"
+    # echo -e "long queue for 2 jobs:"
+    # echo -e "${bt}qjob serial auto auto max longq7 e52660 2 name.par /home/usr/sgrid/exe/sgrid${rt}"
+    # echo -e "or"
+    # echo -e "${bt}qjob serial auto auto max longq7 haswell 2 name.par /home/usr/sgrid/exe/sgrid${rt}"
+    # echo
+    echo -e "Run bam on 2 nodehboi zen nodes using 32 MPI procs in short queue for 5 jobs:"
+    echo -e "${bt}qjob 2 32 auto max shortq7 zen:hboi 5 name.par \"/home/usr/bam/exe/bam -nt 4\"${rt}"
+    # echo
+    # echo -e "Run nmesh on 1 epyc7702 node using 220 MPI procs in short queue for 4.5 hours:"
+    # echo -e "${bt}qjob 1 220 1 4:30:00 shortq7 epyc7702 1 name.par /home/usr/nmesh/exe/nmesh${rt}"
+  else
+    export mode=$1
+    export nodes=$1
+    #if [ $mode = serial ]
+    #then
+    #  export nodes=1
+    #fi
+    export ppn=$2
+    export ppn_mode=$2
+    export tpn=$3
+    export tpn_mode=$3
+    export memory=""
+    export walltime=$4
+    export queue=$5
+    # export constraint=$6
+    export constraint=$(echo -e $6 | awk --field-separator ':' '{ print $1 }')
+    export hboi=$(echo -e $6 | awk --field-separator ':' '{ print $2 }')
+    export njobs=$(echo -e $7 | awk --field-separator ':' '{ print $1 }')
+    export DependOnID=$(echo -e $7 | awk --field-separator ':' '{ print $2 }')
+    # export account=$7
+    export account="dummyaccount"
+    export jobname=$8
+    export command=$9
+    export parfile=${10}
+
+    if [ -z "${parfile}" ]
+    then
+      export parfile=$jobname
+    fi
+
+    if [ $walltime = max ]
+    then
+      if [ $queue = debug ]
+      then
+        export walltime='1:00:00'
+      elif [ $queue = shortq7 ]
+      then
+        export walltime='6:00:00'
+      # elif [ $queue = mediumq7 ]
+      # then
+      #   export walltime='72:00:00'
+      # elif [ $queue = longq7 ]
+      # then
+      #   export walltime='168:00:00'
+      else
+        echo "Unknown queue spec."
+        export walltime=''
+      fi
+    fi
+
+    #let procs=nodes*ppn
+    #export procs
+
+    # # set tpn_max appropriately for main 2 types of nodes
+    # if [ C$constraint = Cepyc ]
+    # then
+    #   tpn_max=64
+    # else
+    #   tpn_max=20
+    # fi
+    tpn_max=64
+
+    # for amd constraints
+    if [ C$constraint = Cepyc7702 ]
+    then
+      tpn_max=256
+    elif [ C$constraint = Czen ] && [ -n "$hboi" ]
+    then
+      tpn_max=128
+    # elif [ C$constraint = Cepyc7551 ]
+    # then
+    #   tpn_max=64
+    # # for intel constraints
+    # elif [ C$constraint = Ce2680 ]
+    # then
+    #   tpn_max=40
+    # elif [ C$constraint = Ce2660 ]
+    # then
+    #   tpn_max=32
+    # elif [ C$constraint = Cepyc74f3 ]
+    # then
+    #   tpn_max=96
+    # elif [ C$constraint = Cxeon613 ]
+    # then
+    #   tpn_max=64
+    # elif [ C$constraint = Ce52660 ]
+    # then
+    #   tpn_max=40
+    # elif [ C$constraint = Ce2680 ]
+    # then
+    #   tpn_max=40
+    fi
+    # there should be more constraints...
+
+    # set ppn properly
+    if [ $mode = serial ] # only can use 1 node with 1 proc in serial mode
+    then
+      export nodes=1
+      export ppn=1
+    elif [ $ppn_mode = all ] # use all cores per node for MPI procs
+    then
+      let ppn=tpn_max
+      export ppn
+    elif [ $ppn_mode = auto ] # set ppn appropriately if tpn is specified, using max cpus per node
+    then
+      let ppn=tpn_max/tpn
+      export ppn
+    fi
+
+    # set tpn correctly 
+    if  [ $tpn_mode = auto ] # set tpn appropriately if ppn is specified, using max cpus per node
+    then
+      let tpn=tpn_max/ppn
+      export tpn
+    elif [ $ppn_mode = all ] && [ $mode != serial ] # use all cores per node for MPI, so 1 thread/proc
+    then
+      export tpn=1
+    fi
+
+    # set total numbers of MPI procs correctly
+    let procs=nodes*ppn
+    export procs
+
+    # compute OMP_NUM_THREADS for OpenMP
+    let OMP_NUM_THREADS=tpn
+    export OMP_NUM_THREADS
+    # options from Quent to set threads properly
+    export OMP_PLACES=SOCKETS
+    export OMP_DISPLAY_ENV=TRUE
+    export OMP_DISPLAY_AFFINITY=TRUE 
+ 
+    if [ $mode = serial ]
+    then
+      export MPIRUN="$command $parfile"
+    else
+      # old way of running before prun was suggested:
+      # export MPIRUN="mpirun -np $procs $command $parfile"
+      
+      # deprecating prun, as it runs basically mpirun with
+      # defaults which does not go nice with threads:
+      # export MPIRUN="prun $command $parfile"
+      
+      # set mpirun properly: no need for -np as it looks
+      # at SLURM variable and sets number of procs
+       export MPIRUN="mpirun -report-bindings --display-allocation \
+--display-map --map-by socket $command $parfile"
+      
+    fi
+
+    # these two can be used to have more MPI tags with Intel's MPI
+    # sum of TAG_BITS and RANK_BITS has to be 39, e.g. 30+9:
+    export MPIR_CVAR_CH4_OFI_TAG_BITS
+    export MPIR_CVAR_CH4_OFI_RANK_BITS
+    export OMPI_MCA_mpi_preconnect_all=1
+
+    echo -e "HOSTNAME = $HOSTNAME , i.e. KOKO"
+    echo -e "nodes = $nodes"
+    echo -e "ppn = $ppn"
+    echo -e "tpn = $tpn"
+    echo -e "procs = $procs"
+    echo -e "OMP_NUM_THREADS = $OMP_NUM_THREADS"
+    echo -e "walltime = $walltime"
+    echo -e "queue = $queue"
+    echo -e "constraint = $constraint"
+    echo -e "njobs = $njobs"
+    echo -e "account = $account"
+    echo -e "jobname = $jobname"
+    echo -e "command = $command"
+    echo -e "parfile = $parfile"
+    echo
+    echo -e "MPIRUN = $MPIRUN"
+
+    if [ -z "${DependOnID}" ]
+    then
+      LASTJOBID=ThereIsNoJobToDependOn
+    else
+      LASTJOBID=$DependOnID
+    fi
+    i=1
+    while [ $i -le $njobs ];
+    do
+      QSUB="sbatch -t $walltime \
+--nodes=$nodes --exclusive \
+--ntasks=$procs \
+--cpus-per-task=$OMP_NUM_THREADS \
+--mem=0 \
+-A $account \
+-J $jobname \
+-p $queue \
+-o $parfile.o%J"
+      echo $LASTJOBID
+      if [ $LASTJOBID = ThereIsNoJobToDependOn ];
+      then
+        QSUB2=""
+      else
+        QSUB2=" -d afterany:$LASTJOBID"
+      fi
+      QSUB="$QSUB$QSUB2"
+
+      if [ -z "${constraint}" ]
+      then
+        QSUB2=""
+      else
+        QSUB2=" -C $constraint"
+      fi
+      QSUB="$QSUB$QSUB2"
+
+      QSUB="$QSUB \
+            $HOME/bin/qjob_script"
+      export QSUB
+      echo
+      echo -e "calling sbatch:"
+      echo -e $QSUB | tee -a $jobname.sbatch
+      # execute qsub and save output also in $jobname.last-sbatch
+      $QSUB | tee -a $jobname.sbatch
+      LASTJOBID=$(tail -n1 $jobname.sbatch | awk '{ print $NF }')
+
+      let i=i+1
+    done    # end of while loop
+ fi
+# End of ATHENE
+
 
 ##############
 # for ANVIL: #
