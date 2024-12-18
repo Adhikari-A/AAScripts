@@ -434,8 +434,7 @@ ${pa}jobname${rt}."
       fi
       QSUB="$QSUB$QSUB2"
 
-      QSUB="$QSUB \
-            $HOME/bin/qjob_script"
+      QSUB="$QSUB $HOME/bin/qjob_script"
       export QSUB
       echo
       echo -e "calling sbatch:"
@@ -839,8 +838,7 @@ ${pa}jobname${rt}."
       fi
       QSUB="$QSUB$QSUB2"
 
-      QSUB="$QSUB \
-            $HOME/bin/qjob_script"
+      QSUB="$QSUB $HOME/bin/qjob_script"
       export QSUB
       echo
       echo -e "calling sbatch:"
@@ -1107,8 +1105,7 @@ ${pa}jobname${rt}."
       fi
       QSUB="$QSUB$QSUB2"
 
-      QSUB="$QSUB \
-            $HOME/bin/qjob_script"
+      QSUB="$QSUB $HOME/bin/qjob_script"
       export QSUB
       echo
       echo "calling sbatch:"
