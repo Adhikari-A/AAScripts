@@ -36,8 +36,18 @@ then
   echo "Accepted PROGRAM options: nmesh, bam, sgrid."
   echo "Specifications for LEVEL_OF_DELETION by PROGRAM:"
   echo
-  echo "-p        -l          files deleted"
-  echo ""
+  echo "-p     -l          files deleted"
+  echo "nmesh   0  ADM*, *_previous, trK*, mom*, normmom*, C3GH_H[yz]*"
+  echo "           C3GH_Phi*, C3GH_th*, C3GH_cP*, C3GH_gnD*, C3GH_PinD*"
+  echo "           C3GH*[yz].*, GHG_err_C3*, GHG_P*, GHG_gt[xyz]*, GHG_gyz*,"
+  echo "           *mean*, *.*Y*, *.*Z*, *.*[XYZ][XYZ]*, *.xz.*, *.yz.*,"
+  echo "           x.??.*, y.??.*, z.??.*, timer*, *Wv*, GRHD_Sy*, GRHD_Sz*"
+  echo "           checkpoint-* "
+  echo
+  echo "        1  level 0 + checkpoint*, stdo*, *maxAbs*, GHG*.*X*, GHG_H*"
+  echo
+  echo "        2  level 0 + 1 + GHG*, *.*X* (! *.00X,*.0X,*.04X,*.4X,*.10X)"
+  echo "             *.xyz.*, *.xy.*, *.*t (! *.00t,*.0t,*.04t,*.4t,*.10t,*.t)"
 elif [ -z "$prog" ] && [ -n "$l" ]
 then
   echo "PROGRAM missing."
@@ -78,14 +88,13 @@ else
       find . -name "GHG_P*" -exec rm -rfv {} +
       find . -name "GHG_gt[xyz]*" -exec rm -rfv {} +
       find . -name "GHG_gyz*" -exec rm -rfv {} +
-      find . -name "GHG_H[tx].*X**" -exec rm -rfv {} +
 
       find . -name "*mean*" -exec rm -rfv {} +
 
       find . -name "*.*Y*" -exec rm -rfv {} +
       find . -name "*.*Z*" -exec rm -rfv {} +
 
-      find . -name "*[XYZ][XYZ]*" -exec rm -rfv {} +
+      find . -name "*.*[XYZ][XYZ]*" -exec rm -rfv {} +
 
       find . -name "*.xz.*" -exec rm -rfv {} +
       find . -name "*.yz.*" -exec rm -rfv {} +
@@ -139,13 +148,20 @@ else
         if [[ "${prog,,}" == n* ]]
         then
           find . -name "GHG*" -exec rm -rfv {} +
-          find . -name "*.*X*" -exec rm -rfv {} +
+          find . -name "*.*X*" \
+                       ! -name "*.00X" \
+                       ! -name "*.0X" \
+                       ! -name "*.04X" \
+                       ! -name "*.4X" \
+                       ! -name "*.10X" \
+                      -exec rm -rfv {} +
           find . -name "*.xyz.*" -exec rm -rfv {} +
           find . -name "*.xy.*" -exec rm -rfv {} +
-          find . -name "*.[]" -exec rm -rfv {} +
           find . -type f -name "*.*t" \
                        ! -name "*.00t" \
+                       ! -name "*.0t" \
                        ! -name "*.04t" \
+                       ! -name "*.4t" \
                        ! -name "*.10t" \
                        ! -name "*.t" \
                       -exec rm -rfv {} +
