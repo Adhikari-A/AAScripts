@@ -37,12 +37,12 @@ then
   echo "Specifications for LEVEL_OF_DELETION by PROGRAM:"
   echo
   echo "-p     -l          files deleted"
-  echo "nmesh   0  ADM*, *_previous, trK*, mom*, normmom*, C3GH_H[yz]*"
-  echo "           C3GH_Phi*, C3GH_th*, C3GH_cP*, C3GH_gnD*, C3GH_PinD*"
-  echo "           C3GH*[yz].*, GHG_err_C3*, GHG_P*, GHG_gt[xyz]*, GHG_gyz*,"
-  echo "           *mean*, *.*Y*, *.*Z*, *.*[XYZ][XYZ]*, *.xz.*, *.yz.*,"
-  echo "           x.??.*, y.??.*, z.??.*, timer*, *Wv*, GRHD_Sy*, GRHD_Sz*"
-  echo "           checkpoint-* *vtk*"
+  echo "nmesh   0  ADM* (! ADM_alpha*), *_previous, trK*, mom*, normmom*,"
+  echo "           C3GH_H[yz]*, C3GH_Phi*, C3GH_th*, C3GH_cP*, C3GH_gnD*, "
+  echo "           C3GH_PinD*, C3GH*[yz].*, GHG_err_C3*, GHG_P*, GHG_gt[xyz]*, "
+  echo "           GHG_gyz*, *mean*, *.*Y*, *.*Z*, *.*[XYZ][XYZ]*, "
+  echo "           *.xz.*, *.yz.*, x.??.*, y.??.*, z.??.*, timer*, *Wv*,"
+  echo "           GRHD_Sy*, GRHD_Sz*, checkpoint-* *vtk*"
   echo
   echo "        1  level 0 + checkpoint*, stdo*, *maxAbs*, GHG*.*X*, GHG_H*"
   echo
@@ -64,7 +64,7 @@ else
     echo "===================================================="
     if [[ "${prog,,}" == n* ]]
     then
-      find . -name "ADM*" -exec rm -rfv {} +
+      find . -name "ADM*" ! -name "ADM_alpha*" -exec rm -rfv {} +
       find . -name "*_previous" -exec rm -rfv {} +
       find . -name "trK*"  -exec rm -rfv {} +
       find . -name "momx*" -exec rm -rfv {} +
