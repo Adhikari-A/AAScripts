@@ -42,7 +42,7 @@ then
   echo "           C3GH*[yz].*, GHG_err_C3*, GHG_P*, GHG_gt[xyz]*, GHG_gyz*,"
   echo "           *mean*, *.*Y*, *.*Z*, *.*[XYZ][XYZ]*, *.xz.*, *.yz.*,"
   echo "           x.??.*, y.??.*, z.??.*, timer*, *Wv*, GRHD_Sy*, GRHD_Sz*"
-  echo "           checkpoint-* "
+  echo "           checkpoint-* *vtk*"
   echo
   echo "        1  level 0 + checkpoint*, stdo*, *maxAbs*, GHG*.*X*, GHG_H*"
   echo
@@ -112,6 +112,8 @@ else
 
       find . -name "checkpoint-?" -exec rm -rfv {} +
       find . -name "checkpoint-??" -exec rm -rfv {} +
+
+      find . -name "*vtk*" -exec rm -rfv {} +
 
       # find . -name "ADM*" -exec rm -rfv {} +
       # find . -name "*_previous" -exec rm -rfv {} +
