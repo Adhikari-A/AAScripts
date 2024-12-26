@@ -47,7 +47,7 @@ then
   echo "        1  level 0 + checkpoint*, stdo*, *maxAbs*, GHG*.*X*, GHG_H*"
   echo
   echo "        2  level 0 + 1 + GHG*, *.*X* (! *.00X,*.0X,*.04X,*.4X,*.10X)"
-  echo "             *.xyz.*, *.xy.*, *.*t (! *.00t,*.0t,*.04t,*.4t,*.10t,*.t)"
+  echo "           *.xyz.*, *.xy.*, *.*t (! *.00t,*.0t,*.04t,*.4t,*.10t,*.t,*.txt)"
 elif [ -z "$prog" ] && [ -n "$l" ]
 then
   echo "PROGRAM missing."
@@ -166,6 +166,7 @@ else
                        ! -name "*.4t" \
                        ! -name "*.10t" \
                        ! -name "*.t" \
+                       ! -name "*.txt" \
                       -exec rm -rfv {} +
         # find . -name "ADM*" -exec rm -rfv {} +
         # find . -name "*_previous" -exec rm -rfv {} +
