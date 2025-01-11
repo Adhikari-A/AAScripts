@@ -118,11 +118,22 @@ else
       # find . -name "ADM*" -exec rm -rfv {} +
       # find . -name "*_previous" -exec rm -rfv {} +
       # echo "Deleteing nmesh files."
-    # elif  [[ "${prog,,}" == b* ]]
-    # then
-    #   find . -name "AHmod*" -exec rm -rfv {} +
-    #   find . -name "ah*" -exec rm -rfv {} +
-    #   find . -name "ADM_mass" -exec rm -rfv {} +
+    elif  [[ "${prog,,}" == b* ]]
+    then
+      find . -name "AHmod*" -exec rm -rfv {} +
+      find . -name "ah*" -exec rm -rfv {} +
+      find . -name "ADM_mass" -exec rm -rfv {} +
+      find . -name "ejecta_spheres" -exec rm -rfv {} +
+      find . -name "Mbar_spheres" -exec rm -rfv {} +
+      find . -name "moving_puncture_integrate*" -exec rm -rfv {} +
+      find . -name "output_r" -exec rm -rfv {} +
+      find . -name "puncture_properties" -exec rm -rfv {} +
+      find . -name "rho_mode" -exec rm -rfv {} +
+      find . -name "stdout.*" -exec rm -rfv {} +
+      find . -name "timer.*" -exec rm -rfv {} +
+      find . -name "checkpoint.*-*" -exec rm -rfv {} +
+    else
+      echo "I don't know how to handle output from this program yet."
     fi
     echo "===================================================="
     echo "Done deleting level 0 files."
@@ -132,49 +143,58 @@ else
       echo "===================================================="
       if [[ "${prog,,}" == n* ]]
       then
- 
         # echo "Deleteing nmesh files."
         find . -name "checkpoint*" -exec rm -rfv {} +
         find . -name "stdo*" -exec rm -rfv {} +
         find . -name "*maxAbs*" -exec rm -rfv {} +
         find . -name "GHG*.*X*" -exec rm -rfv {} +
         find . -name "GHG_H*" -exec rm -rfv {} +
-
+      elif  [[ "${prog,,}" == b* ]]
+      then
+        find . -name "checkpoint.*" -exec rm -rfv {} +
+        find . -name "*.dat" -exec rm -rfv {} +
+        find . -name "*.xz*_vtk" -exec rm -rfv {} +
+        find . -name "*.yz*_vtk" -exec rm -rfv {} +
+        find . -name "alpha*vtk" -exec rm -rfv {} +
+        find . -name "beta*vtk" -exec rm -rfv {} +
+        find . -name "*[012]_vtk" -exec rm -rfv {} +
+        find . -name "*_v2.*vtk" -exec rm -rfv {} +
+        find . -name "output_1d" -exec rm -rfv {} +
       fi
       echo "===================================================="
       echo "Done deleting level 1 files."
-      if [ "$l" -ge 2 ]
+    fi
+    if [ "$l" -ge 2 ]
+    then
+      echo "Deleting level 2 files."
+      echo "===================================================="
+      if [[ "${prog,,}" == n* ]]
       then
-        echo "Deleting level 2 files."
-        echo "===================================================="
-        if [[ "${prog,,}" == n* ]]
-        then
-          find . -name "GHG*" -exec rm -rfv {} +
-          find . -name "*.*X*" \
-                       ! -name "*.00X" \
-                       ! -name "*.0X" \
-                       ! -name "*.04X" \
-                       ! -name "*.4X" \
-                       ! -name "*.10X" \
-                      -exec rm -rfv {} +
-          find . -name "*.xyz.*" -exec rm -rfv {} +
-          find . -name "*.xy.*" -exec rm -rfv {} +
-          find . -type f -name "*.*t" \
-                       ! -name "*.00t" \
-                       ! -name "*.0t" \
-                       ! -name "*.04t" \
-                       ! -name "*.4t" \
-                       ! -name "*.10t" \
-                       ! -name "*.t" \
-                       ! -name "*.txt" \
-                      -exec rm -rfv {} +
-        # find . -name "ADM*" -exec rm -rfv {} +
-        # find . -name "*_previous" -exec rm -rfv {} +
-        # echo "Deleteing nmesh files."
-        fi
-        echo "===================================================="
-        echo "Done deleting level 2 files."
+        find . -name "GHG*" -exec rm -rfv {} +
+        find . -name "*.*X*" \
+                      ! -name "*.00X" \
+                      ! -name "*.0X" \
+                      ! -name "*.04X" \
+                      ! -name "*.4X" \
+                      ! -name "*.10X" \
+                    -exec rm -rfv {} +
+        find . -name "*.xyz.*" -exec rm -rfv {} +
+        find . -name "*.xy.*" -exec rm -rfv {} +
+        find . -type f -name "*.*t" \
+                      ! -name "*.00t" \
+                      ! -name "*.0t" \
+                      ! -name "*.04t" \
+                      ! -name "*.4t" \
+                      ! -name "*.10t" \
+                      ! -name "*.t" \
+                      ! -name "*.txt" \
+                    -exec rm -rfv {} +
+      elif  [[ "${prog,,}" == b* ]]
+      then
+        find . -name "output_[23]d" -exec rm -rfv {} +
       fi
+      echo "===================================================="
+      echo "Done deleting level 2 files."
     fi
   fi
 fi
