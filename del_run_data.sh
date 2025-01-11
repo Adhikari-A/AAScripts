@@ -37,6 +37,7 @@ then
   echo "Specifications for LEVEL_OF_DELETION by PROGRAM:"
   echo
   echo "-p     -l          files deleted"
+  echo "-----------------------------------------------------------------------"
   echo "nmesh   0  ADM* (! ADM_alpha*), *_previous, trK*, mom*, normmom*,"
   echo "           C3GH_H[yz]*, C3GH_Phi*, C3GH_th*, C3GH_cP*, C3GH_gnD*, "
   echo "           C3GH_PinD*, C3GH*[yz].*, GHG_err_C3*, GHG_P*, GHG_gt[xyz]*, "
@@ -48,6 +49,16 @@ then
   echo
   echo "        2  level 0 + 1 + GHG*, *.*X* (! *.00X,*.0X,*.04X,*.4X,*.10X)"
   echo "           *.xyz.*, *.xy.*, *.*t (! *.00t,*.0t,*.04t,*.4t,*.10t,*.t,*.txt)"
+  echo
+  echo "bam     0  AHmod*, ah*, ADM_mass, ejecta_spheres. Mbar_spheres,"
+  echo "           moving_puncture_integrate*, output_r, puncture_properties"
+  echo "           rho_mode, stdout.*, timer.* checkpoint.*-*"
+  echo
+  echo "        1  level 0 + checkpoint.*, *.dat, *.?z*_vtk, alpha*vtk, beta*vtk,"
+  echo "           *[012]_vtk, *_v2.*vtk, output_1d"
+  echo
+  echo "        2  level 0 + 1 + output_[23]d"
+
 elif [ -z "$prog" ] && [ -n "$l" ]
 then
   echo "PROGRAM missing."
@@ -153,8 +164,7 @@ else
       then
         find . -name "checkpoint.*" -exec rm -rfv {} +
         find . -name "*.dat" -exec rm -rfv {} +
-        find . -name "*.xz*_vtk" -exec rm -rfv {} +
-        find . -name "*.yz*_vtk" -exec rm -rfv {} +
+        find . -name "*.?z*_vtk" -exec rm -rfv {} +
         find . -name "alpha*vtk" -exec rm -rfv {} +
         find . -name "beta*vtk" -exec rm -rfv {} +
         find . -name "*[012]_vtk" -exec rm -rfv {} +
