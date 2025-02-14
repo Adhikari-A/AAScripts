@@ -45,9 +45,9 @@ then
   echo "           *.xz.*, *.yz.*, x.??.*, y.??.*, z.??.*, timer*, *Wv*,"
   echo "           GRHD_Sy*, GRHD_Sz*, checkpoint-* *vtk*"
   echo
-  echo "        1  level 0 + checkpoint*, stdo*, *maxAbs*, GHG*.*X*, GHG_H*"
+  echo "        1  level 0 + checkpoint*, stdo*, *maxAbs*, GHG_H*"
   echo
-  echo "        2  level 0 + 1 + GHG*, *.*X* (! *.00X,*.0X,*.04X,*.4X,*.10X)"
+  echo "        2  level 0 + 1 + *.*X* (! *.00X,*.0X,*.04X,*.4X,*.10X)"
   echo "           *.xyz.*, *.xy.*, *.*t (! *.00t,*.0t,*.04t,*.4t,*.10t,*.t,*.txt)"
   echo
   echo "bam     0  AHmod*, ah*, ADM_mass, ejecta_spheres. Mbar_spheres,"
@@ -158,7 +158,6 @@ else
         find . -name "checkpoint*" -exec rm -rfv {} +
         find . -name "stdo*" -exec rm -rfv {} +
         find . -name "*maxAbs*" -exec rm -rfv {} +
-        find . -name "GHG*.*X*" -exec rm -rfv {} +
         find . -name "GHG_H*" -exec rm -rfv {} +
       elif  [[ "${prog,,}" == b* ]]
       then
@@ -180,7 +179,6 @@ else
       echo "===================================================="
       if [[ "${prog,,}" == n* ]]
       then
-        find . -name "GHG*" -exec rm -rfv {} +
         find . -name "*.*X*" \
                       ! -name "*.00X" \
                       ! -name "*.0X" \
