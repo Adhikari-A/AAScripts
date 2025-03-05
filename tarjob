@@ -22,7 +22,7 @@ else
   echo
   
   export slurmcommand="sbatch -t 168:00:00 \
-                      --nodes=1 --exclusive \
+                      --nodes=1 \
                      --cpus-per-task=1 \
                      -A dummyaccount \
                      -o tar_$dir.o%J \
