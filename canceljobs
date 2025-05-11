@@ -19,7 +19,9 @@ then
   echo "              in the consecutive list of jobs to be canceled"
   echo "" 
 else
-  for (( i=first_ID; i<=last_ID; i++ ))
+  # avoid this next line to prevent jobs in queue from starting 
+  # for (( i=first_ID; i<=last_ID; i++ ))
+  for (( i=last_ID; i>=first_ID; i-- ))
   do
     list="$list $i"
   done
