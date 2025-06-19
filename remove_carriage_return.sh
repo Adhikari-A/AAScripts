@@ -4,10 +4,25 @@
 # and newline (\n) **inside each line**, then writes the cleaned text to
 # the output file.
 
-set -euo pipefail
+infile="$1"
+outfile="$2"
 
-infile=${1:?please give an input file}
-outfile=${2:?please give an output file}
+if [[ -z $infile || -z $outfile ]]
+then
+  echo "Usage:"
+  echo "./remove_carriage_return.sh IN_FILE OUT_FILE"
+  echo "IN_FILE: contains annoying carriage return characters"
+  echo "OUT_FILE: where the nice clean content wil be saved"
+  exit 0
+fi
+
+if [ ! -f "$infile" ]
+then
+  echo "This is not a file:"
+  echo "$infile"
+  echo "Exiting."
+  exit 1
+fi
 
 # Use a temporary file so we don’t clobber the output if something goes wrong.
 tmp=$(mktemp)
