@@ -44,7 +44,7 @@ spack config --scope=user add modules:default:roots:tcl:"$modules_root"
 
 # (Optional) discover externals — uncomment if/when you want it
 # echo ">> Discovering external packages (loaded modules, system tools) ..."
-# spack external find --scope=user
+spack external find --scope=user
 
 # ---------------------------- build --------------------------------
 echo ">> Installing package: $pkg"
