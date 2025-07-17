@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# spack_install  — build a package with the *site* Spack while
-#                   writing everything into your own $HOME.
+# spack_install — build a package with the site Spack while keeping
+#                 ALL write‑paths inside your HOME directory.
 #
 # Usage:  spack_install PACKAGE [INSTALL_PATH]
 #         default INSTALL_PATH = $HOME/spack_installs
@@ -25,10 +25,12 @@ fi
 
 install_path=${2:-"$HOME/spack_installs"}   # user‑writable store
 modules_root="${install_path}/modules"      # private module tree
+stage_root="${install_path}/stage"          # where Spack unpacks sources
+src_cache="$HOME/.spack/source_cache"       # downloads & mirrors
 
 # ------------------ one‑shot, user‑scope Spack tweaks ---------------
 echo ">> Updating user config to new format (if needed) ..."
-spack config --scope=user update config || true   # no-op if already current
+spack config --scope=user update config || true
 
 echo ">> Ensuring solver bootstrap lives in \$HOME ..."
 export SPACK_USER_BOOTSTRAP_ROOT="$HOME/.spack/bootstrap"
@@ -42,13 +44,22 @@ spack config --scope=user add upstreams:system:install_tree:/opt/ohpc/pub/spack/
 echo ">> Directing TCL modulefiles into: $modules_root"
 spack config --scope=user add modules:default:roots:tcl:"$modules_root"
 
-# (Optional) discover externals — uncomment if/when you want it
-# echo ">> Discovering external packages (loaded modules, system tools) ..."
+echo ">> Using personal source cache: $src_cache"
+spack config --scope=user add config:source_cache:"$src_cache"
+
+echo ">> Using personal build stage:  $stage_root"
+spack config --scope=user add config:build_stage:"$stage_root"
+
+# (Optional) discover externals
+echo ">> Discovering external packages (modules, system tools) ..."
 spack external find --scope=user
 
 # ---------------------------- build --------------------------------
 echo ">> Installing package: $pkg"
 spack install "$pkg"
 
-echo ">> Done.  Prefixes are under $install_path"
-echo ">> Modulefiles are under $modules_root"
+echo ">> Done."
+echo "   Prefixes  -> $install_path"
+echo "   Modulefiles -> $modules_root"
+echo "   Source cache -> $src_cache"
+echo "   Build stage  -> $stage_root"
