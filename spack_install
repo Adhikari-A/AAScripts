@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# spack_install — build a package with the site Spack while keeping
-#                 ALL write‑paths inside your HOME directory.
+# spack_install — build a package with the *site* Spack while keeping
+#                 all writable paths in $HOME.
 #
 # Usage:  spack_install PACKAGE [INSTALL_PATH]
 #         default INSTALL_PATH = $HOME/spack_installs
@@ -23,43 +23,46 @@ EOF
   exit 1
 fi
 
-install_path=${2:-"$HOME/spack_installs"}   # user‑writable store
+install_path=${2:-"$HOME/spack_installs"}   # user-writable store
 modules_root="${install_path}/modules"      # private module tree
 stage_root="${install_path}/stage"          # where Spack unpacks sources
 src_cache="$HOME/.spack/source_cache"       # downloads & mirrors
 
-# ------------------ one‑shot, user‑scope Spack tweaks ---------------
-echo ">> Updating user config to new format (if needed) ..."
-spack config --scope=user update config || true
+# ------------------ one-shot, user-scope Spack tweaks ---------------
+echo ">> Upgrading user config schema (non-interactive) ..."
+spack -y config --scope=user update config || true
 
 echo ">> Ensuring solver bootstrap lives in \$HOME ..."
 export SPACK_USER_BOOTSTRAP_ROOT="$HOME/.spack/bootstrap"
 
 echo ">> Setting private install tree: $install_path"
-spack config --scope=user add config:install_tree:"$install_path"
+spack -y config --scope=user add config:install_tree:"$install_path"
 
 echo ">> Adding site install tree as an upstream ..."
-spack config --scope=user add upstreams:system:install_tree:/opt/ohpc/pub/spack/opt/spack
+spack -y config --scope=user add upstreams:system:install_tree:/opt/ohpc/pub/spack/opt/spack
 
 echo ">> Directing TCL modulefiles into: $modules_root"
-spack config --scope=user add modules:default:roots:tcl:"$modules_root"
+spack -y config --scope=user add modules:default:roots:tcl:"$modules_root"
 
 echo ">> Using personal source cache: $src_cache"
-spack config --scope=user add config:source_cache:"$src_cache"
+spack -y config --scope=user add config:source_cache:"$src_cache"
 
 echo ">> Using personal build stage:  $stage_root"
-spack config --scope=user add config:build_stage:"$stage_root"
+spack -y config --scope=user add config:build_stage:"$stage_root"
 
-# (Optional) discover externals
 echo ">> Discovering external packages (modules, system tools) ..."
-spack external find --scope=user
+spack -y external find --scope=user || true   # harmless if nothing found
+
+# Re-upgrade in case any of the above rewrote config in the old format
+echo ">> Re-upgrading user config schema (final pass) ..."
+spack -y config --scope=user update config || true
 
 # ---------------------------- build --------------------------------
 echo ">> Installing package: $pkg"
-spack install "$pkg"
+spack -y install "$pkg"
 
 echo ">> Done."
-echo "   Prefixes  -> $install_path"
-echo "   Modulefiles -> $modules_root"
+echo "   Prefixes     -> $install_path"
+echo "   Modulefiles  -> $modules_root"
 echo "   Source cache -> $src_cache"
 echo "   Build stage  -> $stage_root"
