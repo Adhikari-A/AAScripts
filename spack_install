@@ -27,20 +27,28 @@ install_path=${2:-"$HOME/spack_installs"}   # user‑writable store
 modules_root="${install_path}/modules"      # private module tree
 
 # ------------------ one‑shot, user‑scope Spack tweaks ---------------
-# 1. keep Spack's solver/bootstrap stuff in \$HOME
+echo ">> Updating user config to new format (if needed) ..."
+spack config --scope=user update config || true   # no-op if already current
+
+echo ">> Ensuring solver bootstrap lives in \$HOME ..."
 export SPACK_USER_BOOTSTRAP_ROOT="$HOME/.spack/bootstrap"
 
-# 2. private install tree
-spack config add config:install_tree:"$install_path"
+echo ">> Setting private install tree: $install_path"
+spack config --scope=user add config:install_tree:"$install_path"
 
-# 3. reuse the cluster’s pre‑built packages
-spack config add upstreams:system:install_tree:/opt/ohpc/pub/spack/opt/spack
+echo ">> Adding site install tree as an upstream ..."
+spack config --scope=user add upstreams:system:install_tree:/opt/ohpc/pub/spack/opt/spack
 
-# 4. write TCL modulefiles into \$HOME instead of /opt
-spack config add modules:default:roots:tcl:"$modules_root"
+echo ">> Directing TCL modulefiles into: $modules_root"
+spack config --scope=user add modules:default:roots:tcl:"$modules_root"
 
-# (Optional) pull in already‑loaded system modules as externals
-# spack external find  --scope=user   # uncomment if/when you need it
+# (Optional) discover externals — uncomment if/when you want it
+# echo ">> Discovering external packages (loaded modules, system tools) ..."
+# spack external find --scope=user
 
 # ---------------------------- build --------------------------------
+echo ">> Installing package: $pkg"
 spack install "$pkg"
+
+echo ">> Done.  Prefixes are under $install_path"
+echo ">> Modulefiles are under $modules_root"
