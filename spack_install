@@ -30,7 +30,8 @@ src_cache="$HOME/.spack/source_cache"       # downloads & mirrors
 
 # ------------------ one-shot, user-scope Spack tweaks ---------------
 echo ">> Upgrading user config schema (non-interactive) ..."
-spack -y config --scope=user update config || true
+# spack -y config --scope=user update config || true
+yes | spack config --scope=user update config || true
 
 echo ">> Ensuring solver bootstrap lives in \$HOME ..."
 export SPACK_USER_BOOTSTRAP_ROOT="$HOME/.spack/bootstrap"
