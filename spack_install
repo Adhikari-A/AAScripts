@@ -1,34 +1,46 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# spack_install  — build a package with the *site* Spack while
+#                   writing everything into your own $HOME.
+#
+# Usage:  spack_install PACKAGE [INSTALL_PATH]
+#         default INSTALL_PATH = $HOME/spack_installs
+#
+set -euo pipefail
 
-pack="$1"
+# ------------------------- parse arguments --------------------------
+pkg=${1:-}
+if [[ -z ${pkg} ]]; then
+  cat <<EOF
+Usage: spack_install PACKAGE [INSTALL_PATH]
 
-if [[ -z $pack ]]
-then
-  echo "Usage: spack_install PACKAGE [ INSTALL_PATH ]"
-  echo
-  echo "If  installs INSTALL_PATH is not provided,"
-  echo "PACKAGE is installed in:"
-  echo "${HOME}/spack_installs"
-  echo "User should verify if PACKAGE exists in spack libs through:"
-  echo "spack list PACKAGE"
+If INSTALL_PATH is omitted, packages are installed under:
+  \$HOME/spack_installs
+
+Verify that PACKAGE exists with:
+  spack list PACKAGE
+EOF
+  exit 1
 fi
 
-install_path="${HOME}/spack_installs"
-if [[ -n $2 ]]
-then
-  install_path="$2"
-fi
+install_path=${2:-"$HOME/spack_installs"}   # user‑writable store
+modules_root="${install_path}/modules"      # private module tree
 
-# All changes below live only in ~/.spack  (no root rights needed)
-export SPACK_USER_BOOTSTRAP_ROOT=$HOME/.spack/bootstrap
+# ------------------ one‑shot, user‑scope Spack tweaks ---------------
+# 1. keep Spack's solver/bootstrap stuff in \$HOME
+export SPACK_USER_BOOTSTRAP_ROOT="$HOME/.spack/bootstrap"
 
-# Tell Spack to use a private install tree
+# 2. private install tree
 spack config add config:install_tree:"$install_path"
 
-# Let Spack re-use the cluster’s packages (upstreams)
+# 3. reuse the cluster’s pre‑built packages
 spack config add upstreams:system:install_tree:/opt/ohpc/pub/spack/opt/spack
 
-# auto-mark existing modules as “external”
-spack external find  # detects loaded and discoverable modules
+# 4. write TCL modulefiles into \$HOME instead of /opt
+spack config add modules:default:roots:tcl:"$modules_root"
 
-spack install "$pack"
+# (Optional) pull in already‑loaded system modules as externals
+# spack external find  --scope=user   # uncomment if/when you need it
+
+# ---------------------------- build --------------------------------
+spack install "$pkg"
