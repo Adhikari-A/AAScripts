@@ -1,0 +1,34 @@
+#!/bin/bash
+
+pack="$1"
+
+if [[ -z $pack ]]
+then
+  echo "Usage: spack_install PACKAGE [ INSTALL_PATH ]"
+  echo
+  echo "If  installs INSTALL_PATH is not provided,"
+  echo "PACKAGE is installed in:"
+  echo "${HOME}/spack_installs"
+  echo "User should verify if PACKAGE exists in spack libs through:"
+  echo "spack list PACKAGE"
+fi
+
+install_path="${HOME}/spack_installs"
+if [[ -n $2 ]]
+then
+  install_path="$2"
+fi
+
+# All changes below live only in ~/.spack  (no root rights needed)
+export SPACK_USER_BOOTSTRAP_ROOT=$HOME/.spack/bootstrap
+
+# Tell Spack to use a private install tree
+spack config add config:install_tree:"$install_path"
+
+# Let Spack re-use the cluster’s packages (upstreams)
+spack config add upstreams:system:install_tree:/opt/ohpc/pub/spack/opt/spack
+
+# auto-mark existing modules as “external”
+spack external find  # detects loaded and discoverable modules
+
+spack install "$pack"

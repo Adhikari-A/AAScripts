@@ -114,23 +114,27 @@ def clean_file(in_path,o_path,ti):
     
     # for d in data: # reading through each data line in file
     for l in lines: # reading through each data line in file
-      if l and l[0]!='"':
-        tokens = l.split()
-        # print(d[0])
-        # first time value or next time value to be read
-        if not last_included or float(tokens[ti]) > last_included:
-          if not last_included:  ln_std = len(tokens) # number of items in first line
-          ln = len(tokens) # number of items in currnt line
-          if ln == ln_std: # if current line has same number of items as first
-            last_included = float(tokens[ti]) # setting new time to last read
-            # l = ""
-            # for num in d:  l+="{} ".format(num)
-            # f.write(l+"\n")
-            f.write(l)
-            # print(d)
-          elif lcount==1: # if second line problematic, not sure what is happening
-            print("Something is problematic in file.")
-            break
+      if l:
+        if l[0]=='"' or l[0]=='#': # header line
+          header_line = f"# {l}"
+          f.write(header_line)
+        else: # data line  
+          tokens = l.split()
+          # print(d[0])
+          # first time value or next time value to be read
+          if not last_included or float(tokens[ti]) > last_included:
+            if not last_included:  ln_std = len(tokens) # number of items in first line
+            ln = len(tokens) # number of items in currnt line
+            if ln == ln_std: # if current line has same number of items as first
+              last_included = float(tokens[ti]) # setting new time to last read
+              # l = ""
+              # for num in d:  l+="{} ".format(num)
+              # f.write(l+"\n")
+              f.write(l)
+              # print(d)
+            elif lcount==1: # if second line problematic, not sure what is happening
+              print("Something is problematic in file.")
+              break
           
       lcount += 1
     
