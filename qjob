@@ -23,14 +23,14 @@ export hostname=$(hostname -d)
 # Save the current IFS value export hostname=`hostname -d`
 OLD_IFS=$IFS
 
-if command -v dircolors &> /dev/null; 
+if command -v dircolors &> /dev/null;
 then
   # Set the delimiter
   IFS=':'
-  
+
   # extract all colors in LS_COLORS
   read -ra colors_specs <<< "$(dircolors)"
-  
+
   for colors_spec in "${colors_specs[@]}";
   do
     #if echo -e $colors_spec | grep 'di=' &> /dev/null;
@@ -49,7 +49,7 @@ then
       pac=${tokens[-1]}
     fi
   done
-  
+
 else
   #echo -e "not there"
   hec="01;34"
@@ -148,7 +148,7 @@ for ${pa}nodes${rt}"
     echo
     echo -e "  Maximum time limits of (CPU) queues as of July 17, 2024:"
     echo -e "  ${he}queue         time limit        priority level        symbol${rt}"
-    echo -e "  ${bt}debug${rt}           1:00:00               4                 ${bt}d${rt}"                            
+    echo -e "  ${bt}debug${rt}           1:00:00               4                 ${bt}d${rt}"
     echo -e "  ${bt}shortq7${rt}         6:00:00               3                 ${bt}s${rt}"
     echo -e "  ${bt}mediumq7${rt}       72:00:00               2                 ${bt}m${rt}"
     echo -e "  ${bt}longq7${rt}        168:00:00               1                 ${bt}l${rt}"
@@ -336,7 +336,7 @@ ${pa}jobname${rt}."
       export ppn
     fi
 
-    # set tpn correctly 
+    # set tpn correctly
     if  [ $tpn_mode = auto ] # set tpn appropriately if ppn is specified, using max cpus per node
     then
       let tpn=tpn_max/ppn
@@ -356,24 +356,24 @@ ${pa}jobname${rt}."
     # options from Quent to set threads properly
     export OMP_PLACES=SOCKETS
     export OMP_DISPLAY_ENV=TRUE
-    export OMP_DISPLAY_AFFINITY=TRUE 
- 
+    export OMP_DISPLAY_AFFINITY=TRUE
+
     if [ $mode = serial ]
     then
       export MPIRUN="$command $parfile"
     else
       # old way of running before prun was suggested:
       # export MPIRUN="mpirun -np $procs $command $parfile"
-      
+
       # deprecating prun, as it runs basically mpirun with
       # defaults which does not go nice with threads:
       # export MPIRUN="prun $command $parfile"
-      
+
       # set mpirun properly: no need for -np as it looks
       # at SLURM variable and sets number of procs
        export MPIRUN="mpirun -report-bindings --display-allocation \
 --display-map --map-by socket $command $parfile"
-      
+
     fi
 
     # these two can be used to have more MPI tags with Intel's MPI
@@ -536,7 +536,7 @@ for ${pa}nodes${rt}"
     echo
     echo -e "  Maximum time limits of (CPU) queues as of December 14, 2024:"
     echo -e "  ${he}queue         time limit        priority level        symbol${rt}"
-    echo -e "  ${bt}debug${rt}           1:00:00               2                 ${bt}d${rt}"                            
+    echo -e "  ${bt}debug${rt}           1:00:00               2                 ${bt}d${rt}"
     echo -e "  ${bt}shortq7${rt}         6:00:00               1                 ${bt}s${rt}"
     # echo -e "  ${bt}mediumq7${rt}       72:00:00               2                 ${bt}m${rt}"
     # echo -e "  ${bt}longq7${rt}        168:00:00               1                 ${bt}l${rt}"
@@ -575,7 +575,7 @@ for ${pa}nodes${rt}"
     echo -e "  nodeamd[018-020]         3   256     1T    100   ${bt}epyc7702${rt}  ${bt}d${rt},${bt}s${rt}"
     echo -e "  nodegpu[010,026-035]    11    64   128G     95   ${bt}zen${rt}         ${bt}s${rt}"
     echo -e "  nodehboi[011,012]        2   128   256G     90   ${bt}zen${rt}         ${bt}s${rt}"
-    echo 
+    echo
     echo -e "  The 'weight' determines priority, with higher number being higher priority."
     echo -e "  Since nodegpu and nodehboi both has same constrint, one should distinguish when"
     echo -e "  using the nodehboi nodes by specifying ${pa}constraint${rt} to ${bt}zen:hboi${rt}."
@@ -606,6 +606,13 @@ for ${pa}nodes${rt}"
     echo -e "${pa}parfile (optional)${rt}: name of parfile"
     echo -e "  This is optional and can be left blank if par file is specified in \
 ${pa}jobname${rt}."
+    echo
+    echo -e "${he}NOTE${rt}: If you want to execute some shell commands before your actual"
+    echo -e "      job command is executed, you can put them in the file"
+    echo -e "      ${bt}qjob_execute_commands${rt} inside the directory: ${bt}~/bin/${rt}."
+    echo -e "      The ${bt}qjob_script${rt} will execute each line in this file"
+    echo -e "      as a command through the ${bt}eval${rt} command."
+    echo -e "      This can be used to load or remove moduoles if needed."
     echo
     echo -e "${he}EXAMPLES:${rt}"
     # echo -e "Get 2 epyc7551 nodes with all MPI procs in long queue with max time using"
@@ -740,7 +747,7 @@ ${pa}jobname${rt}."
       export ppn
     fi
 
-    # set tpn correctly 
+    # set tpn correctly
     if  [ $tpn_mode = auto ] # set tpn appropriately if ppn is specified, using max cpus per node
     then
       let tpn=tpn_max/ppn
@@ -760,24 +767,24 @@ ${pa}jobname${rt}."
     # options from Quent to set threads properly
     export OMP_PLACES=SOCKETS
     export OMP_DISPLAY_ENV=TRUE
-    export OMP_DISPLAY_AFFINITY=TRUE 
- 
+    export OMP_DISPLAY_AFFINITY=TRUE
+
     if [ $mode = serial ]
     then
       export MPIRUN="$command $parfile"
     else
       # old way of running before prun was suggested:
       # export MPIRUN="mpirun -np $procs $command $parfile"
-      
+
       # deprecating prun, as it runs basically mpirun with
       # defaults which does not go nice with threads:
       # export MPIRUN="prun $command $parfile"
-      
+
       # set mpirun properly: no need for -np as it looks
       # at SLURM variable and sets number of procs
        export MPIRUN="mpirun -report-bindings --display-allocation \
 --display-map --map-by socket $command $parfile"
-      
+
     fi
 
     # these two can be used to have more MPI tags with Intel's MPI
@@ -1011,10 +1018,10 @@ ${pa}jobname${rt}."
         export walltime=''
       fi
     fi
-    
+
     # set tpn max
      tpn_max=128
- 
+
     # set ppn properly
     if [ $mode = serial ] # only can use 1 node with 1 proc in serial mode
     then
@@ -1030,12 +1037,12 @@ ${pa}jobname${rt}."
       export ppn
     fi
 
-    # set tpn correctly 
+    # set tpn correctly
     if  [ $tpn_mode = auto ] # set tpn appropriately if ppn is specified, using max cpus pe
     then
       let tpn=tpn_max/ppn
       export tpn
-    elif [ $ppn_mode = all ] && [ $mode != serial ] # use all cores per node for MPI, so 1 
+    elif [ $ppn_mode = all ] && [ $mode != serial ] # use all cores per node for MPI, so 1
     then
       export tpn=1
     fi
@@ -1113,7 +1120,7 @@ ${pa}jobname${rt}."
       # execute qsub and save output also in $jobname.last-sbatch
       $QSUB | tee -a $jobname.sbatch
       LASTJOBID=$(tail -n1 $jobname.sbatch | awk '{ print $NF }')
- 
+
       let i=i+1
     done    # end of while loop
 

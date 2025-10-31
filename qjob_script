@@ -37,12 +37,14 @@ then
   echo "Found file with potential list of commands to execute."
   echo "Executing commands."
   while IFS= read -r line; do
-    echo "--------------------------"
+    echo "==================================="
     echo "Command:"
     echo "$line"
-    echo "*****"
+    echo "-----------"
     eval "$line"
   done < $HOME/bin/qjob_execute_commands
+  echo "==================================="
+  echo "Done executing commands."
 else
   echo "No commands to execute."
 fi
