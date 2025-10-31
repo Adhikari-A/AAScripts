@@ -30,7 +30,8 @@ echo "MPIBOOT = $MPIBOOT"
 echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo "Checking whether file $HOME/bin/qjob_execute_commands exists."
+echo "Checking whether the following file exists:"
+echo "$HOME/bin/qjob_execute_commands"
 if [[ -f $HOME/bin/qjob_execute_commands ]]
 then
   echo "Found file with potential list of commands to execute."
