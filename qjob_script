@@ -30,10 +30,18 @@ echo "MPIBOOT = $MPIBOOT"
 echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo "Checking whether file $HOME/bin/execute_commands exists."
-if [[ -f $HOME/bin/execute_commands ]]
+echo "Checking whether file $HOME/bin/qjob_execute_commands exists."
+if [[ -f $HOME/bin/qjob_execute_commands ]]
 then
   echo "Found file with potential list of commands to execute."
+  echo "Executing commands."
+  while IFS= read -r line; do
+    echo "--------------------------"
+    echo "Command:"
+    echo "$line"
+    echo "*****"
+    eval "$line"
+  done < $HOME/bin/qjob_execute_commands
 else
   echo "No commands to execute."
 fi
