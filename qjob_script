@@ -30,8 +30,8 @@ echo "MPIBOOT = $MPIBOOT"
 echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo "Checking whether file $HOME/execute_commands exists."
-if [[ -f $HOME/execute_commands ]]
+echo "Checking whether file $HOME/bin/execute_commands exists."
+if [[ -f $HOME/bin/execute_commands ]]
 then
   echo "Found file with potential list of commands to execute."
 else
