@@ -30,6 +30,14 @@ echo "MPIBOOT = $MPIBOOT"
 echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Checking whether file $HOME/execute_commands exists."
+if [[ -f $HOME/execute_commands ]]
+then
+  echo "Found file with potential list of commands to execute."
+else
+  echo "No commands to execute."
+fi
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "Info about OpenMP and Slurm environment variable:"
 echo
 env | grep SLURM_
@@ -45,11 +53,14 @@ echo "Important for Intel MPI:"
 echo "MPIR_CVAR_CH4_OFI_TAG_BITS = $MPIR_CVAR_CH4_OFI_TAG_BITS"
 echo "MPIR_CVAR_CH4_OFI_RANK_BITS = $MPIR_CVAR_CH4_OFI_RANK_BITS"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo The master node of this job is `hostname`
-echo The submision directory is `echo $SLURM_SUBMIT_DIR`
+echo "The master node of this job is $(hostname)"
+echo "The submission directory is $SLURM_SUBMIT_DIR"
+# echo The master node of this job is `hostname`
+# echo The submision directory is `echo $SLURM_SUBMIT_DIR`
 echo The node list is $SLURM_NODELIST
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-echo "Info of `hostname` from lscpu:"
+# echo "Info of `hostname` from lscpu:"
+echo "Info of $(hostname) from lscpu:"
 echo
 lscpu
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
@@ -62,7 +73,8 @@ echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 #cd $PBS_O_WORKDIR
 
 echo
-echo "Job started on `hostname` at `date`"
+# echo "Job started on `hostname` at `date`"
+echo "Job started on $(hostname) at $(date)"
 echo "======================================================================"
 
 if [ -n "${MPIBOOT}" ]
@@ -78,5 +90,6 @@ then
 fi
 
 echo "======================================================================"
-echo "Job Ended at `date`"
+# echo "Job Ended at `date`"
+echo "Job ended at $(date)"
 echo
