@@ -679,9 +679,9 @@ ${pa}jobname${rt}."
       # elif [ $queue = mediumq7 ]
       # then
       #   export walltime='72:00:00'
-      # elif [ $queue = longq7 ]
-      # then
-      #   export walltime='168:00:00'
+      elif [ $queue = longq7 ]
+      then
+        export walltime='168:00:00'
       else
         echo "Unknown queue spec."
         export walltime=''
