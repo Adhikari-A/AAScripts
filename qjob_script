@@ -31,8 +31,8 @@ echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "Checking whether the following file exists:"
-echo "$HOME/bin/qjob_execute_commands"
-if [[ -f $HOME/bin/qjob_execute_commands ]]
+echo "$HOME/bin/qjob_exe_coms_start"
+if [[ -f $HOME/bin/qjob_exe_coms_start ]]
 then
   echo "Found file with potential list of commands to execute."
   echo "Executing commands."
@@ -42,7 +42,7 @@ then
     echo "$line"
     echo "-----------"
     eval "$line"
-  done < $HOME/bin/qjob_execute_commands
+  done < $HOME/bin/qjob_exe_coms_start
   echo "==================================="
   echo "Done executing commands."
 else
@@ -101,6 +101,26 @@ then
 fi
 
 echo "======================================================================"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Checking whether the following file exists:"
+echo "$HOME/bin/qjob_exe_coms_end"
+if [[ -f $HOME/bin/qjob_exe_coms_end ]]
+then
+  echo "Found file with potential list of commands to execute."
+  echo "Executing commands."
+  while IFS= read -r line; do
+    echo "==================================="
+    echo "Command:"
+    echo "$line"
+    echo "-----------"
+    eval "$line"
+  done < $HOME/bin/qjob_exe_coms_end
+  echo "==================================="
+  echo "Done executing commands."
+else
+  echo "No commands to execute."
+fi
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 # echo "Job Ended at `date`"
 echo "Job ended at $(date)"
 echo
