@@ -35,7 +35,7 @@ echo "$HOME/bin/qjob_exe_coms_start"
 if [[ -f $HOME/bin/qjob_exe_coms_start ]]
 then
   echo "Found file with potential list of commands to execute."
-  echo "Executing commands."
+  echo "Starting to execute commands at $(date)."
   while IFS= read -r line; do
     echo "==================================="
     echo "Command:"
@@ -44,7 +44,7 @@ then
     eval "$line"
   done < $HOME/bin/qjob_exe_coms_start
   echo "==================================="
-  echo "Done executing commands."
+  echo "Done executing commands at $(date)."
 else
   echo "No commands to execute."
 fi
@@ -101,13 +101,14 @@ then
 fi
 
 echo "======================================================================"
+echo "Job ended at $(date)"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "Checking whether the following file exists:"
 echo "$HOME/bin/qjob_exe_coms_end"
 if [[ -f $HOME/bin/qjob_exe_coms_end ]]
 then
   echo "Found file with potential list of commands to execute."
-  echo "Executing commands."
+  echo "Starting to execute commands at $(date)."
   while IFS= read -r line; do
     echo "==================================="
     echo "Command:"
@@ -116,11 +117,10 @@ then
     eval "$line"
   done < $HOME/bin/qjob_exe_coms_end
   echo "==================================="
-  echo "Done executing commands."
+  echo "Done executing commands at $(date)."
 else
   echo "No commands to execute."
 fi
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 # echo "Job Ended at `date`"
-echo "Job ended at $(date)"
 echo
