@@ -1405,6 +1405,7 @@ ${pa}jobname${rt}."
 -p $queue \
 -o $parfile.o%J
 --exclusive \
+--mem=0 \
 -A $account"
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
