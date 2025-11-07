@@ -95,7 +95,8 @@ then
     echo -e "${he}USAGE:${rt}"
     echo -e "${bt}qjob${rt} ${pa}nodes ppn tpn walltime queue constraint njobs jobname command [parfile]${rt}"
     echo
-    echo -e "${he}NOTE${rt}: ${bt}qjob${rt} only works if you have placed the associated file \
+    echo -e "${he}AUXILIARY FILE DEPENDENCY${rt}:"
+    echo -e "${bt}qjob${rt} only works if you have placed the associated file \
 ${bt}qjob_script${rt}"
     echo -e "      inside the directory: ${bt}~/bin/${rt}."
     echo -e "      If you do not have this directory,"
@@ -607,7 +608,8 @@ for ${pa}nodes${rt}"
     echo -e "  This is optional and can be left blank if par file is specified in \
 ${pa}jobname${rt}."
     echo
-    echo -e "${he}NOTE${rt}: If you want to execute some shell commands before your actual"
+    echo -e "${he}EXECUTING SHELL COMMANDS${rt}:"
+    echo -e "If you want to execute some shell commands before your actual"
     echo -e "      job command is executed, you can put them in the file"
     echo -e "      ${bt}qjob_exe_coms_start${rt} inside the directory: ${bt}~/bin/${rt}."
     echo -e "      The ${bt}qjob_script${rt} will execute each line in this file"
@@ -1246,7 +1248,8 @@ for ${pa}nodes${rt}"
     echo -e "  This is optional and can be left blank if par file is specified in \
 ${pa}jobname${rt}."
     echo
-    echo -e "${he}NOTE${rt}: If you want to execute some shell commands before your actual"
+    echo -e "${he}EXECUTING SHELL COMMANDS${rt}:"
+    echo -e "If you want to execute some shell commands before your actual"
     echo -e "      job command is executed, you can put them in the file"
     echo -e "      ${bt}qjob_exe_coms_start${rt} inside the directory: ${bt}~/bin/${rt}."
     echo -e "      The ${bt}qjob_script${rt} will execute each line in this file"
