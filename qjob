@@ -1362,7 +1362,8 @@ ${pa}jobname${rt}."
       export MPIRUN="$command $parfile"
     else
       # export MPIRUN="mpirun -np $procs $command $parfile"
-      export MPIRUN="mpirun -bootstrap slurm -n \$SLURM_NTASKS $command $parfile"
+      # export MPIRUN="mpirun -bootstrap slurm -n \$SLURM_NTASKS $command $parfile"
+      export MPIRUN="mpiexec -n $procs  $command $parfile"
     fi
 
     # these two can be used to have more MPI tags with Intel's MPI
