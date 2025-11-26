@@ -1447,7 +1447,7 @@ then
   then
     echo -e "${he}USAGE${rt}:"
     echo -e "${bt}qjob${rt} ${pa}nodes ppn tpn walltime pseudo-constraint njobs jobname command [parfile]${rt}"
-    echo -e "     |     |   |     |         |                  ${pa}njobs${rt}=1,2,3,...:DependOnID   "
+    echo -e "     |     |   |     |         |              ${pa}njobs${rt}=1,2,3,...:DependOnID   "
     echo -e "     |     |   |     |      ${pa}pseudo-constraint${rt}=${bt}\"\"${rt},${bt}epyc9354${rt},${bt}opt6180${rt}$,${bt}opt6344${rt}"
     # echo -e "     |     |   |     |      ${pa}queue${rt}=${bt}debug${rt},${bt}shortq7${rt}"
     echo -e "     |     |   |   ${pa}walltime${rt}=1:00:00,6:00:00;${bt}max${rt}"
