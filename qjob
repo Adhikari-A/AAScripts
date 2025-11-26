@@ -1674,12 +1674,17 @@ ${pa}jobname${rt}."
     # fi
     tpn_max=48
     ppr=12
+    nodelist="compute-[1-5]"
 
     # for amd constraints
     if [ C$constraint = Cepyc9354 ]
     then
       tpn_max=128
       ppr=64
+      nodelist="compute-[11-15]"
+    elif [ C$constraint = Copt6344 ]
+    then
+      nodelist="compute-[6-10]"
     fi
     # there may be more constraints in the future when new nodes arrive...
 
@@ -1754,6 +1759,7 @@ $command $parfile"
     echo -e "walltime = $walltime"
     # echo -e "queue = $queue"
     echo -e "pseudo-constraint = $constraint"
+    echo -e "nodelist = $nodelist"
     echo -e "njobs = $njobs"
     # echo -e "account = $account"
     echo -e "jobname = $jobname"
@@ -1776,8 +1782,8 @@ $command $parfile"
 --ntasks=$procs \
 --cpus-per-task=$OMP_NUM_THREADS \
 --mem=0 \
+--nodelist=$nodelist \
 -J $jobname \
--p $queue \
 -o $parfile.o%J"
       echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
