@@ -1554,7 +1554,7 @@ for ${pa}nodes${rt}"
     echo -e "  ${he}nodes             count procs   memory           pseudo-constraint${rt}"
     echo -e "  compute-[1-5]       5     48    125G,230-250G*     ${bt}opt6180${rt}"
     echo -e "  compute-[6-10]      5     48    125G               ${bt}opt6344${rt}"
-    echo -e "  compute-[11-15]     5    128   755G               ${bt}epyc9354${rt}"
+    echo -e "  compute-[11-15]     5    128    755G               ${bt}epyc9354${rt}"
     echo -e "  * Nodes compute-[1-5] have varying memory, with compute-2 having 125G."
     echo
     # echo -e "  The 'weight' determines priority, with higher number being higher priority."
