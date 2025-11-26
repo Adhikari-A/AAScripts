@@ -1527,7 +1527,7 @@ for ${pa}nodes${rt}"
     # echo -e "  https://helpdesk.fau.edu/TDClient/2061/Portal/KB/ArticleDet?ID=141348"
     # echo
     echo -e "${pa}pseudo-constraint${rt}: pseudo-constraint to request specific targeted node"
-    echo -e "  This is can be the specific pseudo-constraint for a node type (listed below),"
+    echo -e "  This can be the specific pseudo-constraint for a node type (listed below),"
     echo -e "  or blank specification as ${bt}\"\"${rt}."
     echo -e "  It behaves similar to regular constraint specification."
     echo -e "  It uses the ${bt}--nodelist${rt} option for ${bt}sbatch${rt} to target specific nodes."
@@ -1750,7 +1750,7 @@ $command $parfile"
     export MPIR_CVAR_CH4_OFI_RANK_BITS
     export OMPI_MCA_mpi_preconnect_all=1
 
-    echo -e "HOSTNAME = $HOSTNAME , i.e. KOKO"
+    # echo -e "HOSTNAME = $HOSTNAME , i.e. KOKO"
     echo -e "nodes = $nodes"
     echo -e "ppn = $ppn"
     echo -e "tpn = $tpn"
@@ -1794,13 +1794,13 @@ $command $parfile"
       fi
       QSUB="$QSUB$QSUB2"
 
-      if [ -z "${constraint}" ]
-      then
-        QSUB2=""
-      else
-        QSUB2=" -C $constraint"
-      fi
-      QSUB="$QSUB$QSUB2"
+      # if [ -z "${constraint}" ]
+      # then
+      #   QSUB2=""
+      # else
+      #   QSUB2=" -C $constraint"
+      # fi
+      # QSUB="$QSUB$QSUB2"
 
       QSUB="$QSUB $HOME/bin/qjob_script"
       export QSUB
