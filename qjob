@@ -1537,7 +1537,7 @@ for ${pa}nodes${rt}"
     echo -e "        For general ${bt}\"\"${rt} this is 48."
     echo
     echo -e "  List of nodes and their pseudo-constraints and specs as of November 20, 2025:"
-    ehco
+    echo
     # echo -e "  ${he}nodes                                    count procs memory weight constraint queues${rt}"
     # echo -e "  nodeamd[002-008]                            7    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt}"
     # echo -e "  nodeamd[009-016]                            8    64   220G    100   ${bt}epyc7551${rt}    ${bt}s${rt},${bt}m${rt},${bt}l${rt}"
