@@ -308,9 +308,9 @@ while True: # start looping forever to backup files
             # update time stamp of last backed up checkpoints
             last_time = timestamp
             if pr:
-              print("Found new chckpoints.")
+              print("Found new checkpoints.")
               print("Backing up checkpoints:")
-            info("Found new chckpoints.")
+            info("Found new checkpoints.")
             info("Backing up checkpoints:")
 
             # rename previous backup files
@@ -372,9 +372,9 @@ while True: # start looping forever to backup files
         # update time stamp of last backed up checkpoints
         last_time = timestamp
         if pr:
-          print("Found new chckpoint.")
+          print("Found new checkpoint.")
           print("Backing up checkpoint:")
-        info("Found new chckpoint.")
+        info("Found new checkpoint.")
         info("Backing up checkpoint:")
         # delete n-th checkppoint backup if it exists
         checkpoint_n = os.path.join(path,f"checkpoint-{n}")
