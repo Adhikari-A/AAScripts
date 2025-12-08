@@ -420,6 +420,10 @@ while True: # start looping forever to backup files
         info("No new checkpoint.")
         if pr:
           print("No new checkpoint.")
+    else:
+        info("No checkpoint yet.")
+        if pr:
+          print("No checkpoint yet.")
 
 
   info("Time: "+str(datetime.datetime.now()))
