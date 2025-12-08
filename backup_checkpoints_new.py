@@ -383,18 +383,18 @@ while True: # start looping forever to backup files
           info(f"Deleting {checkpoint_n} .")
           # shutil.rmtree(checkpoint_n)
           subprocess.run(["rm", "-rf", checkpoint_n], check=True)
-        # first = True
+        first = True
         # back up 1 through n-1 to plus one index
-        if pr :  print("Moving:")
-        info("Moving:")
         for i in range(n-1, 0, -1): # count backwards
           checkpoint_i      = os.path.join(path,f"checkpoint-{i}")
           # check if i-th backup exists
           if os.path.isdir(checkpoint_i):
             checkpoint_iPlus1 = os.path.join(path,f"checkpoint-{i+1}")
             # move to i+1
-            # if first:
-            # first = False
+            if first:
+              if pr :  print("Moving:")
+              info("Moving:")
+              first = False
             if pr :
               print(f"{os.path.basename(checkpoint_i)} ->"
                     f" {os.path.basename(checkpoint_iPlus1)}")
@@ -408,14 +408,21 @@ while True: # start looping forever to backup files
         # rsync_com = (f"rsync -av {checkpoint} {checkpoint_1}")
         # os.system(rsync_com)
         if pr :
+          print("Copying with rsync:")
           print(f"{os.path.basename(checkpoint)} ->"
                 f" {os.path.basename(checkpoint_1)}")
+        info("Copying with rsync:")
         info(f"{os.path.basename(checkpoint)} ->"
              f" {os.path.basename(checkpoint_1)}")
-        subprocess.run(
+        result = subprocess.run(
           ["rsync", "-av", checkpoint + "/", checkpoint_1],
           check=True
         )
+        if pr :
+          print(result.stdout)
+          print(result.stderr)
+        info(result.stdout)
+        info(result.stderr)
       else:
         info("No new checkpoint.")
         if pr:
