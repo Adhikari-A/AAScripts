@@ -336,8 +336,12 @@ while True: # start looping forever to backup files
                   print(name+" to "+name+'-'+str(n))
               # copy latest checkpoint to newest backup
               # shutil.copy(checkpoint,backup_i)
-              rsync_com = (f"rsync -av f{checkpoint} {backup_i}")
-              os.system(rsync_com)
+              # rsync_com = (f"rsync -av f{checkpoint} {backup_i}")
+              # os.system(rsync_com)
+              subprocess.run(
+                ["rsync", "-av", checkpoint + "/", backup_i],
+                check=True
+              )
 
           else:
             info("No new checkpoints.")
