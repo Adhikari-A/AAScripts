@@ -88,8 +88,8 @@ def perform_operations(name,git_versions,special_branches):
     print("Changed git status:")
     # os.system("git rev-parse HEAD")
     os.system("git status | head -1")
-    
-  
+
+
   if '-r' not in sys.argv and good:
     print()
     print("Current git repo version:")
@@ -107,7 +107,7 @@ def perform_operations(name,git_versions,special_branches):
 
   print()
   print("Done with "+name+".")
-  
+
 ##############################################
 ################## main part #################
 ##############################################
@@ -116,7 +116,7 @@ print("'compile.py'")
 prl()
 
 if '-h' in sys.argv:
-  
+
   print("Purpose:")
   print("Compile or pull BAM, Sgrid or Nmesh with proper branches")
   print("While retaining git repo versions for last stable build.")
@@ -146,6 +146,12 @@ if '-h' in sys.argv:
   print("---------")
   print()
   print("In all cases 'main' stands for main part of the program.")
+  print()
+  print("Precompilation setups, such a module loading and removing,")
+  print("can be done through file precompile_setup.")
+  print("This file is checked and each line in is executed")
+  print("as a command before compiling.")
+  print("In this file, part of the line following '#' is treated as comment.")
 
 else:
   #if '-p' in sys.argv:
@@ -153,20 +159,20 @@ else:
   #  prl()
   #  os.system("make git_pull")
   #  prl()
-  
+
   if '-nc' not in sys.argv and '-ncl' not in sys.argv:
     print("Make clean:")
     prl()
     os.system("make clean")
     prl()
-  
+
   tokens = (str(datetime.datetime.now())).split()
   tokens[1] = tokens[1].split('.')[0]
   # cur_time = tokens[0].replace('-','')+tokens[1].replace(':','')
   cur_time = tokens[0]+"."+tokens[1].replace(':','-')
-  
+
   good = True
-  keep_branches = False 
+  keep_branches = False
   top = "../.."
   projects_dir = "src/projects/"
   if not os.path.isdir(projects_dir):
@@ -175,16 +181,16 @@ else:
       projects_dir = None
       print("Projects directory not found.")
       good = False
-  
+
   path = os.getcwd()
   git_ver_file = path+"/git_repo_versions."+cur_time
   git_ver_file_last = None
   #git_ver_file = path+"/git_repo_versions.txt"
   #git_ver_file_last = path+"/git_repo_versions_last.txt"
   git_versions = {}
-  
+
   if '-p' in sys.argv and '-r' not in sys.argv:
-    
+
     if 'detached' in subprocess.check_output(['git', 'branch'],
                                              text=True,
                                              stderr=subprocess.PIPE):
@@ -208,11 +214,11 @@ else:
           if not os.path.isfile(exe):
             exe = None
             print("No current executable")
-      
+
       if exe and '-nc' not in sys.argv:
         print("Keeping current stable executable as "+exe+"_stable."+cur_time+".")
         os.system("mv "+exe+" "+exe+"_stable."+cur_time)
-    
+
   #  print("Adding key to agent.")
   #  os.system("eval `add-key.py ~/.ssh/id_rsa`")
   #  print("Renaming git_repo_versions.txt to git_repo_versions_last.txt.")
@@ -223,7 +229,7 @@ else:
       git_ver_file_last = sys.argv[sys.argv.index('-r')+1]
     except:
       pass
-      
+
     if git_ver_file_last and os.path.isfile(git_ver_file_last):
       with open(git_ver_file_last) as file:
         print("Reading git repo versions to revert to\n"
@@ -234,7 +240,7 @@ else:
           print("No git repo version information found.")
           op = input("Do you want to proceed? (y/n): ")
           if op != 'y':  good =  False
-        
+
     else:
       print("Last git repo versions file not found.")
       print("Choosing default configuration: no -p and no -r.")
@@ -257,9 +263,9 @@ else:
     print("Choosing default configuration: no -r and no -kb.")
     op = input("Do you want to proceed? (y/n): ")
     if op != 'y':  good =  False
-  
+
   if good:
-    
+
     special_branches = {}
     exe = "exe/bam"
     if not os.path.isfile(exe):
@@ -271,17 +277,17 @@ else:
           exe = None
     if exe and '-nc' not in sys.argv:
       os.system("mv "+exe+" "+exe+"."+cur_time)
-  
+
     if '-r' not in sys.argv:
       print("Opening git repo versions file to write into:")
       print(git_ver_file)
       f = open(git_ver_file,"w+")
-    
+
       prl()
       if '-kb' not in sys.argv:
         print("Checking for special_branches file.")
         if os.path.isfile("special_branches"):
-          with open("special_branches") as file:
+          with open("special_branches", 'r') as file:
             print("Reading special_branches file.")
             # print("special_branches")
             special_branches = {line.split()[0]: line.split()[1] for line in file}
@@ -294,40 +300,61 @@ else:
           print("Keeping pre-checked branches for all repos.")
           op = input("Do you want to proceed? (y/n): ")
           if op != 'y':  good =  False
-  
+
   if good:
-  
+
     prl()
     perform_operations("main",git_versions,special_branches)
-    
+
     if projects_dir:
-    
+
       prl()
       print("Going into projects.")
       os.chdir(projects_dir)
       print("Projects:")
       os.system("ls")
       dls_all = os.listdir()
-      
+
       # print(git_versions)
-      
-      for d in dls_all: 
+
+      for d in dls_all:
         if not d.startswith('.') and os.path.isdir(d) and good:
           prl()
           os.chdir(d)
           perform_operations(d,git_versions,special_branches)
           os.chdir("..")
-  
+
     if '-r' not in sys.argv:
       print("Closing git repo versions file.")
       f.close()
-    
+
     if good:
       prl()
       print("Done checking out Branches and/or versions. :)")
       if '-nc' not in sys.argv:
-        print("Now, building executable. :)")
         os.chdir(top)
+        print("Checking for file precompile_setup.")
+        if os.path.isfile('precompile_setup'):
+          print("Found. Executing lines in file.")
+          lines = None
+          with open('precompile_setup', 'r') as pcfile:
+            lines = pcfile.readlines()
+          if lines:
+            print("---------------")
+            for line in lines:
+              if line:
+                com=line.split('#', 1)[0].strip()
+                if com:
+                  print("Command:\n"+com)
+                  print("===========")
+                  os.system(com)
+                  print("===========")
+          else:
+            print("File is empty")
+        else:
+          print("Not found.")
+        prl()
+        print("Now, building executable. :)")
         if '-ncl' not in sys.argv:
           print("Make clean:")
           prl()
