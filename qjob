@@ -1934,7 +1934,7 @@ for ${pa}nodes${rt}"
     echo -e "  the specified ID finishes."
 #    echo -e "  Max number of consecutive jobs that can be submitted: 10 (!!VERIFY!!)"
     echo
-    echo -e "${pa}njobs${rt}: 
+    echo -e "${pa}njobs${rt}:"
     echo
     echo -e "${pa}jobname${rt}: name of the job"
     echo -e "  This can simply be the par file name, unless end ${pa}parfile${rt} option is specified."
@@ -1942,7 +1942,7 @@ for ${pa}nodes${rt}"
     echo -e "${pa}command${rt}: command or executable for the job"
     echo -e "  In case of executable, it is better to provide full path here or symbolic link."
     echo
-    echo -e "${pa}parfile (optional)${rt}: name of parfile"
+    echo -e "${pa}parfile${rt}: name of parfile"
     echo -e "  This is optional and can be left blank if par file is specified in \
 ${pa}jobname${rt}."
     echo
