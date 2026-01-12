@@ -11,6 +11,15 @@ import sys
 import subprocess
 import datetime
 
+# set subprocess args based on version
+kwargs = dict(stderr=subprocess.PIPE)
+
+
+if sys.version_info >= (3, 7):
+  kwargs["text"] = True
+else:
+  kwargs["universal_newlines"] = True
+
 ##############################################
 ### Function to print a line in output #######
 ##############################################
@@ -56,9 +65,10 @@ def perform_operations(name,git_versions,special_branches):
     print("After change:")
     os.system("git branch -a")
   if '-p' in sys.argv and '-r' not in sys.argv:
-    if 'detached' in subprocess.check_output(['git', 'branch'],
-                                             text=True,
-                                             stderr=subprocess.PIPE):
+    # if 'detached' in subprocess.check_output(['git', 'branch'],
+    #                                          text=True,
+    #                                          stderr=subprocess.PIPE):
+    if 'detached' in subprocess.check_output(['git', 'branch'], **kwargs):
       print("WARNING: You are in a 'detached HEAD' state.")
       print()
       print("Pulling with a detached HEAD is not healthy for you. :(")
@@ -99,9 +109,11 @@ def perform_operations(name,git_versions,special_branches):
     print("Saving git repo version hash to file:")
     print(git_ver_file)
     # Run the command and capture the output
-    result = subprocess.check_output(['git', 'rev-parse', 'HEAD'],
-                                   text=True, stderr=subprocess.PIPE)
-                                   # Remove any trailing newline characters
+    # in this version, 'text' only works above 3.6, so had to change
+    # result = subprocess.check_output(['git', 'rev-parse', 'HEAD'],
+    #                                text=True, stderr=subprocess.PIPE)
+    result = subprocess.check_output(['git', 'rev-parse', 'HEAD'], **kwargs)
+    # Remove any trailing newline characters
     git_hash = result.strip()
     f.write(name+" "+git_hash+"\n")
 
@@ -191,9 +203,10 @@ else:
 
   if '-p' in sys.argv and '-r' not in sys.argv:
 
-    if 'detached' in subprocess.check_output(['git', 'branch'],
-                                             text=True,
-                                             stderr=subprocess.PIPE):
+    # if 'detached' in subprocess.check_output(['git', 'branch'],
+    #                                          text=True,
+    #                                          stderr=subprocess.PIPE):
+    if 'detached' in subprocess.check_output(['git', 'branch'], **kwargs):
       print("WARNING: You are in a 'detached HEAD' state.")
       print()
       print("Pulling with a detached HEAD is not healthy for you. :(")
