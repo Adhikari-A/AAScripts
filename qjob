@@ -1908,9 +1908,9 @@ for ${pa}nodes${rt}"
     echo -e "  ${bt}dev-x86${rt}         x86_64       4:00:00           2"
     echo -e "  ${bt}normal-x86${rt}      x86_64      48:00:00          64"
     echo -e "  ${bt}large-x86${rt}       x86_64      72:00:00         128"
-    echo -e "  ${bt}dev-a100-40${rt}     x86_64      4:00:00           1"
+    echo -e "  ${bt}dev-a100-40${rt}     x86_64       4:00:00           1"
     echo -e "  ${bt}normal-a100-40${rt}  x86_64      48:00:00           4"
-    echo -e "  ${bt}dev-a100-80${rt}     x86_64      8:00:00           1"
+    echo -e "  ${bt}dev-a100-80${rt}     x86_64       8:00:00           1"
     echo -e "  ${bt}normal-a100-80${rt}  x86_64      48:00:00           4"
 
     echo
@@ -1934,7 +1934,8 @@ for ${pa}nodes${rt}"
     echo -e "  the specified ID finishes."
 #    echo -e "  Max number of consecutive jobs that can be submitted: 10 (!!VERIFY!!)"
     echo
-    echo -e "${pa}njobs${rt}:"
+    echo -e "${pa}account${rt}: account to charge run's cost to"
+    echo -e "  The available accounts can be found through commmand ${bt}billing${rt}"
     echo
     echo -e "${pa}jobname${rt}: name of the job"
     echo -e "  This can simply be the par file name, unless end ${pa}parfile${rt} option is specified."
@@ -1961,11 +1962,11 @@ ${pa}jobname${rt}."
     echo -e "way as ${bt}~/bin/qjob_exe_coms_start${rt}, but at the end of the job."
     echo
     echo -e "${he}EXAMPLES${rt}:"
-    echo -e "Use 16 nodes in micro queue for full duration for 5 consecutive jobs:"
-    echo -e "${bt}qjob 16 all auto max micro 5 name.par bamps${rt}"
+    echo -e "Use 16 nodes in ${bt}normal-x86${rt} queue for full duration for 5 consecutive jobs:"
+    echo -e "${bt}qjob 16 all auto max normal-x86 5 f202509520cpcaa3x name.par bamps${rt}"
     echo
-    echo -e "Use 40 nodes in general queue for 4 hours:"
-    echo -e "${bt}qjob 40 all auto 4:00:00 general 1 name.par bamps${rt}"
+    echo -e "Use 100 nodes in ${bt}large-x86${rt} queue for 4 hours:"
+    echo -e "${bt}qjob 100 all auto 4:00:00 large-x86 1 f202509520cpcaa3x name.par bamps${rt}"
   else
     export mode=$1
     export nodes=$1
@@ -1983,12 +1984,12 @@ ${pa}jobname${rt}."
     #export constraint=$5
     export njobs=$(echo $6 | awk --field-separator ':' '{ print $1 }')
     export DependOnID=$(echo $6 | awk --field-separator ':' '{ print $2 }')
-    # export account=$6
+    export account=$7
     # export account="dummyaccount"
-    export account=$(sshare -U -u "$USER" -n -P -o user,account | cut -d'|' -f2 | sort -u)
-    export jobname=$7
-    export command=$8
-    export parfile=$9
+    # export account=$(sshare -U -u "$USER" -n -P -o user,account | cut -d'|' -f2 | sort -u)
+    export jobname=$8
+    export command=$9
+    export parfile=${10}
 
     if [ -z "${parfile}" ]
     then
@@ -1997,29 +1998,41 @@ ${pa}jobname${rt}."
 
     if [ $walltime = max ]
     then
-      if [ $queue = test ]
+      if [[ $queue == dev-arm || $queue == dev-x86 || $queue == dev-a100-40 ]]
       then
-        export walltime='00:30:00'
-      elif [ $queue = micro ]
-      then
-        export walltime='48:00:00'
-      elif [ $queue = general ]
+        export walltime='04:00:00'
+      elif [[ $queue == normal-arm || $queue == normal-x86 || \
+              $queue == normal-a100-40 || $queue == normal-a100-80 ]]
       then
         export walltime='48:00:00'
-      elif [ $queue = large ]
+      elif [[ $queue == large-x86 || $queue == large-arm ]]
       then
-        export walltime='24:00:00'
-      elif [ $queue = fat ]
-      then
-        export walltime='48:00:00'
+        export walltime='72:00:00'
       else
         echo "Unknown queue spec."
         export walltime=''
       fi
     fi
 
+    arm=''
+    x86='yes'
+
+    if [[ $queue == dev-arm || $queue == normal-arm ]]
+    then
+      arm='yes'
+      x86=''
+    fi
+
+    export arm
+    export x86
+
     # set tpn max
-     tpn_max=48
+    if [[ -n $arm ]]
+    then
+      tpn_max=48
+    else
+      tpn_max=128
+    fi
 
     # set ppn properly
     if [ $mode = serial ] # only can use 1 node with 1 proc in serial mode
@@ -2059,9 +2072,10 @@ ${pa}jobname${rt}."
     then
       export MPIRUN="$command $parfile"
     else
-      # export MPIRUN="mpirun -np $procs $command $parfile"
-      # export MPIRUN="mpirun -bootstrap slurm -n \$SLURM_NTASKS $command $parfile"
-      export MPIRUN="mpiexec -n $procs  $command $parfile"
+      if [[ -n $x86 ]]
+      then
+        export MPIRUN="srun --ntasks=$procs --cpus-per-task=$tpn $command $parfilename"
+      fi
     fi
 
     # these two can be used to have more MPI tags with Intel's MPI
