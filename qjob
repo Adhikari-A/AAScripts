@@ -2115,7 +2115,7 @@ ${pa}jobname${rt}."
 --cpus-per-task=$OMP_NUM_THREADS \
 -J $jobname \
 -p $queue \
--o $parfile.o%J
+-o $parfile.o%J \
 --exclusive \
 --mem=0 \
 -A $account"
