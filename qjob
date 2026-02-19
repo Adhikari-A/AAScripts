@@ -2074,7 +2074,9 @@ ${pa}jobname${rt}."
     else
       if [[ -n $x86 ]]
       then
-        export MPIRUN="srun --ntasks=$procs --cpus-per-task=$tpn $command $parfile"
+        MPIRUN="srun --ntasks=$procs --cpus-per-task=$tpn"
+        MPIRUN="$MPIRUN --cpu-bind=cores,verbose --distribution=block:block"
+        export MPIRUN="$MPIRUN $command $parfile"
       fi
     fi
 

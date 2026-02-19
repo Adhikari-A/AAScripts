@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
   # Custom usage string
   custom_usage = "get_proper_time.py PATH1 [ PATH2 ... ] " \
-                 "[ -i INT_START ] [ -nb ]\n" \
+                 "[ -i INT_START ]\n" \
                  "                                [ -fsp FILE_SUB_PATH ] "\
                                                   "[ -tc TIME_COLUMN ]\n" \
                  "                                [ -lc LAPSE_COLUMN ] "\
