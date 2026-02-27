@@ -68,8 +68,10 @@ he="\033[${hec}m"
 pa="\033[${pac}m"
 rt=$(tput sgr0)
 
-d="$(date)"
-da=($d)
+# d="$(date)"
+# da=($d)
+
+date_ext="$(date -u +%Y-%m-%d_%H-%M-%S)"
 
 #############
 # for KOKO: #
@@ -1788,7 +1790,7 @@ $command $parfile"
 --mem=0 \
 --nodelist=$nodelist \
 -J $jobname \
--o $parfile.o%J"
+-o $parfile.o%J.$date_ext"
       echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
