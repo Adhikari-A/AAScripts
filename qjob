@@ -841,7 +841,7 @@ ${pa}jobname${rt}."
 -A $account \
 -J $jobname \
 -p $queue \
--o $parfile.o%J"
+-o $parfile.o%J.d$date_ext"
       echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
@@ -1129,7 +1129,7 @@ ${pa}jobname${rt}."
 --cpus-per-task=$OMP_NUM_THREADS \
 -J $jobname \
 -p $queue \
--o $parfile.o%J"
+-o $parfile.o%J.d$date_ext"
 #--exclusive \
 #-A $account"
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
@@ -1415,7 +1415,7 @@ ${pa}jobname${rt}."
 --cpus-per-task=$OMP_NUM_THREADS \
 -J $jobname \
 -p $queue \
--o $parfile.o%J
+-o $parfile.o%J.d$date_ext
 --exclusive \
 --mem=0 \
 -A $account"
@@ -1790,7 +1790,7 @@ $command $parfile"
 --mem=0 \
 --nodelist=$nodelist \
 -J $jobname \
--o $parfile.o%J.$date_ext"
+-o $parfile.o%J.d$date_ext"
       echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
@@ -2119,7 +2119,7 @@ ${pa}jobname${rt}."
 --cpus-per-task=$OMP_NUM_THREADS \
 -J $jobname \
 -p $queue \
--o $parfile.o%J \
+-o $parfile.o%J.d$date_ext \
 --exclusive \
 --mem=0 \
 -A $account"
