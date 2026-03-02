@@ -1,0 +1,290 @@
+#!/bin/bash
+
+cmdline="find_ah_split_job $@"
+export cmdline
+
+# export hostname=`hostname -d`
+export hostname=$(hostname -d)
+if [[ -z $hostname ]]
+then
+  export hostname=$(hostname -A)
+fi
+
+# Save the current IFS value
+OLD_IFS=$IFS
+
+if command -v dircolors &> /dev/null;
+then
+  # Set the delimiter
+  IFS=':'
+
+  # extract all colors in LS_COLORS
+  read -ra colors_specs <<< "$(dircolors)"
+
+  for colors_spec in "${colors_specs[@]}";
+  do
+    #if echo -e $colors_spec | grep 'di=' &> /dev/null;
+    #then
+    #  echo -e "$colors_spec"
+    #fi
+    IFS='='
+    read -ra tokens <<< "$colors_spec"
+#    echo -e -e "\e[${tokens[-1]}m Test\e[m"
+    if [ "${tokens[0]}" = di ]
+    then
+      #echo -e "$colors_spec"
+      hec="01;${tokens[-1]}"
+    elif [ "${tokens[0]}" = ln ]
+    then
+      pac="01;${tokens[-1]}"
+    elif [ "${tokens[0]}" = pi ]
+    then
+      coc="01;${tokens[-1]}"
+    fi
+  done
+
+else
+  #echo -e "not there"
+  hec="01;34"
+  pac="01;36"
+  coc="01;33"
+fi
+
+# Reset IFS to its default value
+IFS=$OLD_IFS
+
+# bt=$(tput bold)
+bt="\033[${coc}m"
+he="\033[${hec}m"
+pa="\033[${pac}m"
+rt=$(tput sgr0)
+
+# d="$(date)"
+# da=($d)
+
+date_ext="$(date -u +%Y-%m-%d_%H-%M-%S)"
+
+####################
+# for BALTASAR: #
+####################
+if [[ $HOSTNAME =~ baltasar ]]
+then
+  echo -e "HOSTNAME = $HOSTNAME , i.e. BALTASAR"
+  if [ -z $1 ]
+  then
+    echo -e "${he}USAGE${rt}:"
+    # echo -e "${bt}find_ah_split_job${rt} ${pa}procs walltime pseudo-constraint times-dir i-first i-last exe base-parfile${rt}"
+    echo -e "${bt}find_ah_split_job${rt} ${pa}procs walltime pseudo-constraint times-stem i-first i-last exe base-parfile${rt}"
+    echo -e "                  |     |        |                 |          |       |      ${pa}exe${rt}=${bt}AHloc3d${rt} exe"
+    echo -e "                  |     |        |                 |          |       ${pa}i-last${rt}=index of last times file in this batch"
+    # echo -e "     |     |      |     |      ${pa}queue${rt}=${bt}debug${rt},${bt}shortq7${rt}"
+    echo -e "                  |     |        |                 |          ${pa}i-first${rt}=index of first times file in this batch"
+    echo -e "                  |     |        |                 ${pa}times-stem${rt}=path till stem of times files"
+    echo -e "                  |     |        ${pa}pseudo-constraint${rt}=${bt}\"\"${rt},${bt}epyc9354${rt},${bt}opt6180${rt},${bt}opt6344${rt}"
+    echo -e "                  |     ${pa}walltime${rt}=walltime for job: 1:00:00,6:00:00;${bt}max${rt}"
+    echo -e "                  ${pa}procs${rt}=total MPI procs: 1,2,..;${bt}all${rt}"
+    echo
+    echo -e "For detailed info, use:"
+    echo -e "${bt}find_ah_split_job -h${rt}"
+  elif [ "$1" = -h ]
+  then
+    echo -e "${he}USAGE${rt}:"
+    echo -e "${bt}find_ah_split_job${rt} ${pa}procs walltime pseudo-constraint times-dir i-first i-last exe base-parfile${rt}"
+    echo
+    echo -e "${he}NOTE${rt}: (a) ${bt}find_ah_split_job${rt} only works if you have placed"
+    echo -e "          the associated file ${bt}find_ah_split_job_script${rt}"
+    echo -e "          inside the directory: ${bt}~/bin/${rt}."
+    echo -e "          If you do not have this directory,"
+    echo -e "          please create it and put the file there."
+    echo -e "      (b) It is assumed that the splitting is done with,"
+    echo -e "          the ${bt}split_file_by_line.sh${rt} script, and the ${bt}times${rt} files"
+    echo -e "          has the corresponding names convention: <${pa}times-stem${rt}>.??"
+    echo -e "      (c) It is also assumed that number of total splits < 100"
+    echo -e "      (d) Lastly, it is further assumed that the parent directory in"
+    echo -e "          path provided in the ${pa}times-stem${rt} argument is the"
+    echo -e "          output_ah dir."
+    echo
+    echo -e "${pa}procs${rt}: total number MPI procs for job"
+    echo -e "  This can be a number within the maximum processes permitted for node type"
+    echo -e "  or it could be ${bt}all${rt} to use all available procs on node as MPI procs"
+    echo
+    echo -e "${pa}walltime${rt}: time requested for job"
+    echo -e "  This can be a time, within the maximum limit,"
+    echo -e "  in the format: ${bt}hhh:mm:ss${rt}."
+    echo -e "  This can also be ${bt}max${rt}, which then sets the time to"
+    echo -e "  maximum permitted, which is 72:00:00."
+    echo
+    echo -e "${pa}pseudo-constraint${rt}: pseudo-constraint to request specific targeted node"
+    echo -e "  This can be the specific pseudo-constraint for a node type (listed below),"
+    echo -e "  or blank specification as ${bt}\"\"${rt}."
+    echo -e "  It behaves similar to regular constraint specification."
+    echo -e "  It uses the ${bt}--nodelist${rt} option for ${bt}sbatch${rt} to target specific nodes."
+    echo -e "  ${he}Note${rt}: Specifications ${bt}all${rt} option for ${pa}procs${rt}"
+    echo -e "        depend on the ${pa}pseudo-constraint${rt} specified as that decides"
+    echo -e "        the maximum procs on a node for the specific node type."
+    echo -e "        For general ${bt}\"\"${rt} this is 48."
+    echo
+    echo -e "  List of nodes and their pseudo-constraints and specs as of November 20, 2025:"
+    echo
+    echo -e "  ${he}nodes             count procs   memory           pseudo-constraint${rt}"
+    echo -e "  compute-[1-5]       5     48    125G,230-250G*     ${bt}opt6180${rt}"
+    echo -e "  compute-[6-10]      5     48    125G               ${bt}opt6344${rt}"
+    echo -e "  compute-[11-15]     5    128    755G               ${bt}epyc9354${rt}"
+    echo -e "  * Nodes compute-[1-5] have varying memory, with compute-2 having 125G."
+    echo
+    echo -e "  Some of this info can be found on page:"
+    echo -e "  https://docs.centra.tecnico.ulisboa.pt/baltasar/baltasar.html"
+    echo -e "  However this is not all up to date."
+    echo -e "  To get exact current details and status of nodes use command:"
+    echo -e "  ${bt}sinfo -Nl${rt}"
+    echo -e "  or"
+    echo -e "  ${bt}sinfo -N -o \"%15N %11P %10T %4c %7z %8m %10l %2D %30b\"${rt}"
+    echo -e "  To get exact current details of idle nodes use command:"
+    echo -e "  ${bt}sinfo -Nl -t idle${rt}"
+    echo -e "  or"
+    echo -e "  ${bt}sinfo -N -o \"%15N %11P %10T %4c %7z %8m %10l %2D %30b\" -t idle${rt}"
+    echo
+    echo -e "${pa}times-stem${rt}: path upto stem of the splitted times files,"
+    echo -e "  i.e, the files have names like <${pa}times-stem${rt}>.00, <${pa}times-stem${rt}>.01, ..."
+    echo
+    echo -e "${pa}i-first${rt}: index of first times file in this batch"
+    echo -e "  This has to an integer greater than 0."
+    echo
+    echo -e "${pa}i-last${rt}: index of last times file in this batch"
+    echo -e "  This has to an integer greater than 0."
+    echo
+    echo -e "${pa}exe${rt}: path or symbolic link to the ${bt}AHloc3d${rt} exe"
+    echo
+    echo -e "${pa}base-parfile${rt}: base par file that will be modified"
+    echo -e "  for each times file for finding horizons"
+
+  else
+    procs=$1
+    export walltime=$2
+    export constraint=$3
+    export timestem=$4
+    export ifirst=$5
+    export ilast=$6
+    export command=$7
+    export parfile=$8
+    export jobname=$(basename "$parfile")
+    mem_max=125
+
+    # defaults
+    procs_max=48
+    # ppr=12
+    nodelist="compute-[1-5]"
+
+    # for and constraints
+    if [ C$constraint = Cepyc9354 ]
+    then
+      procs_max=128
+      mem_max=755
+      nodelist="compute-[11-15]"
+    elif [ C$constraint = Copt6344 ]
+    then
+      nodelist="compute-[6-10]"
+    fi
+    # there may be more constraints in the future when new nodes arrive...
+    export procs_max
+
+    if [ $procs = all ] # use all cores per node for MPI procs
+    then
+      let procs=procs_max
+    fi
+    export procs
+
+    # cross check some stuffs
+    export n_splits=$((ilast - ifirst + 1))
+    if (( n_splits >  procs_max ))
+    then
+      echo "Error: No. of splits: $n_splits > Max procs: $procs_max"
+      exit 1
+    fi
+
+    if [[ ! "$ifirst" =~ ^[0-9]+$ ]]
+    then
+      echo "Error: i-first = $ifirst -> must not be a negative integer"
+      exit 2
+    fi
+
+    if [[ ! "$ilast" =~ ^[0-9]+$ ]]
+    then
+      echo "Error: i-last = $ilast -> must not be a negative integer"
+      exit 3
+    fi
+
+    if [ "$walltime" = max ]
+    then
+      export walltime='72:00:00'
+    fi
+
+    export ranks_per_job=$((procs / n_splits))
+    output_ah_dir=${timestem%/*}
+    [[ "$output_ah_dir" == "$timestem" ]] && output_ah_dir=./
+    export output_ah_dir
+    export used_cores=$((n_splits*ranks_per_job))
+    export idle_cores=$((procs_max-n_splits*ranks_per_job))
+    export mem_per_job$((mem_max / n_splits))
+
+    # get the initial global part of the 
+    export MPIRUN="srun \
+--overlap \
+--exact \
+--nodes=1 \
+--ntasks=$ranks_per_job \
+--cpus-per-task=1 \
+--cpu-bind=cores \
+--distribution=block:block \
+--mem-bind=local \
+$command"
+
+    echo -e "${bt}procs${rt} = $procs"
+    echo -e "${bt}walltime${rt} = $walltime"
+    echo -e "${bt}pseudo-constraint${rt} = $constraint"
+    echo -e "${bt}nodelist${rt} = $nodelist"
+    echo -e "${bt}times-stem${rt} = $timestem"
+    echo -e "${bt}i-first${rt} = $ifirst"
+    echo -e "${bt}i-last${rt} = $ilast"
+    echo -e "${bt}exe${rt} = $command"
+    echo -e "${bt}base-parfile${rt} = $parfile"
+    echo -e "${bt}jobname${rt} = $jobname"
+    echo
+    echo -e "${bt}AHdatadir${rt} = $output_ah_dir"
+    echo -e "${bt}splits count${rt} = $n_splits"
+    echo -e "${bt}ranks/job${rt} = $ranks_per_job"
+    echo -e "${bt}used${rt} = $used_cores"
+    echo -e "${bt}idle${rt} = $idle_cores"
+
+    QSUB="sbatch -t $walltime \
+--nodes=1 --exclusive \
+--ntasks=$procs \
+--cpus-per-task=1 \
+--mem=0 \
+--nodelist=$nodelist \
+-J $jobname \
+-o $jobname.o%J.d$date_ext \
+$HOME/bin/find_ah_split_job_script"
+
+    export QSUB
+    echo
+    echo -e "calling sbatch:"
+    echo -e $QSUB | tee -a $jobname.sbatch
+    # bash /home/ananya/research/utils/AAScripts/find_ah_split_job_script
+    # execute qsub and save output also in $jobname.sbatch
+    $QSUB | tee -a $jobname.sbatch
+    tail -n1 $jobname.sbatch | awk '{ print $NF }'
+  fi
+
+
+# End of BALTASAR
+
+
+#####################
+# for unknown host: #
+#####################
+else
+ echo -e "Environment variable HOSTNAME=$HOSTNAME"
+ echo -e "This host is unknown to me. I don't know what to do. :("
+fi
+

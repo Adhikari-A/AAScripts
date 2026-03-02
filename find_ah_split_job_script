@@ -1,0 +1,173 @@
+#!/bin/bash
+
+# tell me what's happening:
+echo "======================================================================"
+echo $cmdline
+echo "----------------------------------------------------------------------"
+echo "procs = $procs"
+echo "memory = $memory"
+echo "walltime = $walltime"
+echo "queue = $queue"
+echo "constraint = $constraint"
+echo "account = $account"
+echo "jobname = $jobname"
+echo "exe = $command"
+echo "base-parfile = $parfile"
+echo "times-stem = $timestem"
+echo "i-first = $ifirst"
+echo "i-last = $ilast"
+echo
+echo "AHdatadir = $output_ah_dir"
+echo "splits count = $n_splits" 
+echo "ranks/job = $ranks_per_job"
+echo "used = $used_cores"
+echo "idle = $idle_cores"
+
+
+echo
+echo "MPIBOOT = $MPIBOOT"
+echo "MPIRUN = $MPIRUN"
+echo "MPIHALT = $MPIHALT"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Info about Slurm environment variable:"
+echo
+env | grep SLURM_
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "sbatch command:"
+echo "$QSUB"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Package info:"
+echo
+if command -v module >/dev/null 2>&1; then
+  echo "Modules loaded:"
+  echo
+  module list
+fi
+echo
+if command -v spack >/dev/null 2>&1; then
+  # Only print if *something* is actually loaded via Spack
+  if spack find --loaded >/dev/null 2>&1 && [[ -n "$(spack find --loaded 2>/dev/null | sed -n 's/^[[:space:]]\+//p')" ]]; then
+    echo "Spack loaded specs:"
+    echo
+    spack -vl find --loaded
+  fi
+fi
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "The master node of this job is $(hostname)"
+echo "The submission directory is $SLURM_SUBMIT_DIR"
+# echo The master node of this job is `hostname`
+# echo The submision directory is `echo $SLURM_SUBMIT_DIR`
+echo The node list is $SLURM_NODELIST
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+# echo "Info of `hostname` from lscpu:"
+echo "Info of $(hostname) from lscpu:"
+echo
+lscpu
+echo
+echo "free info:"
+free -h
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Job started on $(hostname) at $(date)"
+echo "======================================================================"
+
+#######################################################
+# initial setup
+
+# N=${1:-10}
+
+# TOTAL=${SLURM_NTASKS:-128}   # safer than hardcoding
+# RANKS_PER_JOB=$(( TOTAL / N ))
+
+# padwidth for numbers
+pad_width=2
+
+#######################################################
+# Helper: make a zero-padded index like 01, 02, ...
+
+fmt_idx() {
+  local i=$1
+  printf "%0${pad_width}d" "$i"
+}
+
+#######################################################
+# function to create modified par file
+inject_at_end() {
+  local basepar=$1
+  local timesfile=$2
+  local par_i=$3
+  local job_i=$4
+
+  local outdir="${par_i%.par}"
+  local timesfilename=$(basename "$timesfile")
+
+  echo "------------------------------------------"
+  echo "Current job specs for job ${job_i}:"
+  # echo "$infile"
+  echo "times file: $timesfilename"
+  echo "par file  : $par_i"
+  echo "output dir: $outdir"
+
+  cat "$basepar" > "$par_i"
+  printf '\n' >> "$par_i"
+
+  {
+    printf '%s\n' "#####################################################"
+    printf '%s\n' "# ---- injected piece for job ${job_i} ----"
+    printf '%s\n' "AHloc.datadir = ${output_ah_dir}"
+    printf '%s\n' "AHloc.datatimes = ${timesfilename}"
+    printf '%s\n' "AHloc.outdir = ${outdir}"
+    printf '%s\n' "# ---- end injected ----"
+  } >> "$par_i"
+}
+
+#######################################################
+# main part
+
+pids=()
+# get the par to current dir
+
+echo "------------------------------------------"
+echo "Getting base par file here if it is somewhere else."
+rsync -av --progress $parfile .
+echo "------------------------------------------"
+
+# loop over files
+for i in $(seq "$ifirst" "$ilast"); do
+  baseparfile="$jobname" # since jobname is base name of parfile and it was copied here
+  padded_i="$(fmt_idx "$i")"
+  times="${timestem}.${padded_i}"
+  parfile_i="${jobname%.par}.${padded_i}.par"
+  logfile_i="${jobname}.${padded_i}.log.${SLURM_JOB_ID}"
+
+  if [[ ! -f "$baseparfile" ]]; then
+    echo "Error: missing par file: $baseparfile" >&2
+    exit 3
+  fi
+
+  inject_at_end "$baseparfile" "$times" "$parfile_i" "$i"
+
+  MPIRUN_i="$MPIRUN $parfile_i > $logfile_i 2>&1 &"
+  echo "Command:"
+  echo "$MPIRUN_i"
+  echo "======================================================================"
+  $MPIRUN_i
+  echo "======================================================================"
+
+  #   ./my_mpi_exe "$inj" \
+  #   >"$log" 2>&1 &
+
+  pids+=("$!")
+done
+
+echo "------------------------------------------"
+
+fail=0
+for pid in "${pids[@]}"; do
+  if ! wait "$pid"; then
+    fail=1
+  fi
+done
+echo "======================================================================"
+echo "Job ended at $(date)"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+exit "$fail"

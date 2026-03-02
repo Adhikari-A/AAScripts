@@ -60,7 +60,23 @@ echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "sbatch command:"
 echo "$QSUB"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-module list
+echo "Package info:"
+echo
+if command -v module >/dev/null 2>&1; then
+  echo "Modules loaded:"
+  echo
+  module list
+fi
+echo
+if command -v spack >/dev/null 2>&1; then
+  # Only print if *something* is actually loaded via Spack
+  if spack find --loaded >/dev/null 2>&1 && [[ -n "$(spack find --loaded 2>/dev/null | sed -n 's/^[[:space:]]\+//p')" ]]; then
+    echo "Spack loaded specs:"
+    echo
+    spack -vl find --loaded
+  fi
+fi
+echo
 echo "Important for Intel MPI:"
 echo "MPIR_CVAR_CH4_OFI_TAG_BITS = $MPIR_CVAR_CH4_OFI_TAG_BITS"
 echo "MPIR_CVAR_CH4_OFI_RANK_BITS = $MPIR_CVAR_CH4_OFI_RANK_BITS"
@@ -75,6 +91,9 @@ echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "Info of $(hostname) from lscpu:"
 echo
 lscpu
+echo
+echo "free info:"
+free -h
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 #echo This job runs on the following nodes:
 #echo `cat $PBS_NODEFILE`

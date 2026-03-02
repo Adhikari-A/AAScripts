@@ -24,7 +24,7 @@ then
   export hostname=$(hostname -A)
 fi
 
-# Save the current IFS value export hostname=`hostname -d`
+# Save the current IFS value
 OLD_IFS=$IFS
 
 if command -v dircolors &> /dev/null;
@@ -1682,7 +1682,7 @@ ${pa}jobname${rt}."
     ppr=12
     nodelist="compute-[1-5]"
 
-    # for amd constraints
+    # for and constraints
     if [ C$constraint = Cepyc9354 ]
     then
       tpn_max=128
@@ -1791,7 +1791,7 @@ $command $parfile"
 --nodelist=$nodelist \
 -J $jobname \
 -o $parfile.o%J.d$date_ext"
-      echo $LASTJOBID
+      # echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
         QSUB2=""
