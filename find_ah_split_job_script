@@ -29,6 +29,25 @@ echo "MPIBOOT = $MPIBOOT"
 echo "MPIRUN = $MPIRUN"
 echo "MPIHALT = $MPIHALT"
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Checking whether the following file exists:"
+echo "$HOME/bin/find_ah_exe_coms_start"
+if [[ -f $HOME/bin/find_ah_exe_coms_start ]]
+then
+  echo "Found file with potential list of commands to execute."
+  echo "Starting to execute commands at $(date)."
+  while IFS= read -r line; do
+    echo "==================================="
+    echo "Command:"
+    echo "$line"
+    echo "-----------"
+    eval "$line"
+  done < $HOME/bin/find_ah_exe_coms_start
+  echo "==================================="
+  echo "Done executing commands at $(date)."
+else
+  echo "No commands to execute."
+fi
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "Info about Slurm environment variable:"
 echo
 env | grep SLURM_
@@ -169,5 +188,25 @@ for pid in "${pids[@]}"; do
 done
 echo "======================================================================"
 echo "Job ended at $(date)"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+echo "Checking whether the following file exists:"
+echo "$HOME/bin/find_ah_exe_coms_end"
+if [[ -f $HOME/bin/find_ah_exe_coms_end ]]
+then
+  echo "Found file with potential list of commands to execute."
+  echo "Starting to execute commands at $(date)."
+  while IFS= read -r line; do
+    echo "==================================="
+    echo "Command:"
+    echo "$line"
+    echo "-----------"
+    eval "$line"
+  done < $HOME/bin/find_ah_exe_coms_end
+  echo "==================================="
+  echo "Done executing commands at $(date)."
+else
+  echo "No commands to execute."
+fi
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 exit "$fail"
