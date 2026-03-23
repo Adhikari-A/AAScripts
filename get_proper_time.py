@@ -400,7 +400,7 @@ if __name__ == "__main__":
           else:
             if verb > 2:  print(dl)
             if verb > 1:  print(f"{path}")
-            if Path(path).exists():
+            if path.exists():
               data_lapse = FileData(path,verb)
               data_lapse.remove_repeated_times(tcol,verb)
               data_lapse.save_proper_time_data(tcol,lcol,intstart,joinK,getZ,
