@@ -1757,11 +1757,15 @@ $command $parfile"
 
     fi
 
+    echo "reached here"
+
     if [[ -f $HOME/bin/qjob_exclude_nodes ]]
     then
-      read -r exclude $HOME/bin/qjob_exclude_nodes
+      read -r exclude < $HOME/bin/qjob_exclude_nodes
       exclude=${exclude%$'\r'}
     fi
+
+    echo "also here"
 
     # these two can be used to have more MPI tags with Intel's MPI
     # sum of TAG_BITS and RANK_BITS has to be 39, e.g. 30+9:
