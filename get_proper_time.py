@@ -17,7 +17,6 @@ from pathlib import Path
 
 import argparse
 import textwrap
-from typing import Optional
 
 class FileData:
   def __init__(self, path: Path, verb: int) -> None:

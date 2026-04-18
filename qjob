@@ -389,22 +389,22 @@ ${pa}jobname${rt}."
     export MPIR_CVAR_CH4_OFI_RANK_BITS
     export OMPI_MCA_mpi_preconnect_all=1
 
-    echo -e "HOSTNAME = $HOSTNAME , i.e. KOKO"
-    echo -e "nodes = $nodes"
-    echo -e "ppn = $ppn"
-    echo -e "tpn = $tpn"
-    echo -e "procs = $procs"
-    echo -e "OMP_NUM_THREADS = $OMP_NUM_THREADS"
-    echo -e "walltime = $walltime"
-    echo -e "queue = $queue"
-    echo -e "constraint = $constraint"
-    echo -e "njobs = $njobs"
-    echo -e "account = $account"
-    echo -e "jobname = $jobname"
-    echo -e "command = $command"
-    echo -e "parfile = $parfile"
+    echo -e "${pa}HOSTNAME${rt} = $HOSTNAME , i.e. KOKO"
+    echo -e "${pa}nodes${rt} = $nodes"
+    echo -e "${pa}ppn${rt} = $ppn"
+    echo -e "${pa}tpn${rt} = $tpn"
+    echo -e "${pa}procs${rt} = $procs"
+    echo -e "${pa}OMP_NUM_THREADS${rt} = $OMP_NUM_THREADS"
+    echo -e "${pa}walltime${rt} = $walltime"
+    echo -e "${pa}queue${rt} = $queue"
+    echo -e "${pa}constraint${rt} = $constraint"
+    echo -e "${pa}njobs${rt} = $njobs"
+    echo -e "${pa}account${rt} = $account"
+    echo -e "${pa}jobname${rt} = $jobname"
+    echo -e "${pa}command${rt} = $command"
+    echo -e "${pa}parfile${rt} = $parfile"
     echo
-    echo -e "MPIRUN = $MPIRUN"
+    echo -e "${pa}MPIRUN${rt} = $MPIRUN"
 
     if [ -z "${DependOnID}" ]
     then
@@ -807,22 +807,22 @@ ${pa}jobname${rt}."
     export MPIR_CVAR_CH4_OFI_RANK_BITS
     export OMPI_MCA_mpi_preconnect_all=1
 
-    echo -e "HOSTNAME = $HOSTNAME , i.e. KOKO"
-    echo -e "nodes = $nodes"
-    echo -e "ppn = $ppn"
-    echo -e "tpn = $tpn"
-    echo -e "procs = $procs"
-    echo -e "OMP_NUM_THREADS = $OMP_NUM_THREADS"
-    echo -e "walltime = $walltime"
-    echo -e "queue = $queue"
-    echo -e "constraint = $constraint"
-    echo -e "njobs = $njobs"
-    echo -e "account = $account"
-    echo -e "jobname = $jobname"
-    echo -e "command = $command"
-    echo -e "parfile = $parfile"
+    echo -e "${pa}HOSTNAME${rt} = $HOSTNAME , i.e. KOKO"
+    echo -e "${pa}nodes${rt} = $nodes"
+    echo -e "${pa}ppn${rt} = $ppn"
+    echo -e "${pa}tpn${rt} = $tpn"
+    echo -e "${pa}procs${rt} = $procs"
+    echo -e "${pa}OMP_NUM_THREADS${rt} = $OMP_NUM_THREADS"
+    echo -e "${pa}walltime${rt} = $walltime"
+    echo -e "${pa}queue${rt} = $queue"
+    echo -e "${pa}constraint${rt} = $constraint"
+    echo -e "${pa}njobs${rt} = $njobs"
+    echo -e "${pa}account${rt} = $account"
+    echo -e "${pa}jobname${rt} = $jobname"
+    echo -e "${pa}command${rt} = $command"
+    echo -e "${pa}parfile${rt} = $parfile"
     echo
-    echo -e "MPIRUN = $MPIRUN"
+    echo -e "${pa}MPIRUN${rt} = $MPIRUN"
 
     if [ -z "${DependOnID}" ]
     then
@@ -1097,22 +1097,22 @@ ${pa}jobname${rt}."
     export MPIR_CVAR_CH4_OFI_TAG_BITS
     export MPIR_CVAR_CH4_OFI_RANK_BITS
 
-    echo "HOSTNAME = $HOSTNAME , i.e. ANVIL"
-    echo "nodes = $nodes"
-    echo "ppn = $ppn"
-    echo "tpn = $tpn"
-    echo "procs = $procs"
-    echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"
-    echo "walltime = $walltime"
-    echo "queue = $queue"
+    echo -e "${pa}HOSTNAME${rt} = $HOSTNAME , i.e. ANVIL"
+    echo -e "${pa}nodes${rt} = $nodes"
+    echo -e "${pa}ppn${rt} = $ppn"
+    echo -e "${pa}tpn${rt} = $tpn"
+    echo -e "${pa}procs${rt} = $procs"
+    echo -e "${pa}OMP_NUM_THREADS${rt} = $OMP_NUM_THREADS"
+    echo -e "${pa}walltime${rt} = $walltime"
+    echo -e "${pa}queue${rt} = $queue"
     #echo "constraint = $constraint"
-    echo "njobs = $njobs"
-    echo "account = $account"
-    echo "jobname = $jobname"
-    echo "command = $command"
-    echo "parfile = $parfile"
+    echo -e "${pa}njobs${rt} = $njobs"
+    echo -e "${pa}account${rt} = $account"
+    echo -e "${pa}jobname${rt} = $jobname"
+    echo -e "${pa}command${rt} = $command"
+    echo -e "${pa}parfile${rt} = $parfile"
     echo
-    echo "MPIRUN = $MPIRUN"
+    echo -e "${pa}MPIRUN${rt} = $MPIRUN"
 
     if [ -z "${DependOnID}" ]
     then
@@ -1383,22 +1383,22 @@ ${pa}jobname${rt}."
     export MPIR_CVAR_CH4_OFI_TAG_BITS
     export MPIR_CVAR_CH4_OFI_RANK_BITS
 
-    echo "HOSTNAME = $HOSTNAME , i.e. ANVIL"
-    echo "nodes = $nodes"
-    echo "ppn = $ppn"
-    echo "tpn = $tpn"
-    echo "procs = $procs"
-    echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"
-    echo "walltime = $walltime"
-    echo "queue = $queue"
+    echo -e "${pa}HOSTNAME${rt} = $HOSTNAME , i.e. SUPERMUC-NG"
+    echo -e "${pa}nodes${rt} = $nodes"
+    echo -e "${pa}ppn${rt} = $ppn"
+    echo -e "${pa}tpn${rt} = $tpn"
+    echo -e "${pa}procs${rt} = $procs"
+    echo -e "${pa}OMP_NUM_THREADS${rt} = $OMP_NUM_THREADS"
+    echo -e "${pa}walltime${rt} = $walltime"
+    echo -e "${pa}queue${rt} = $queue"
     #echo "constraint = $constraint"
-    echo "njobs = $njobs"
-    echo "account = $account"
-    echo "jobname = $jobname"
-    echo "command = $command"
-    echo "parfile = $parfile"
+    echo -e "${pa}njobs${rt} = $njobs"
+    echo -e "${pa}account${rt} = $account"
+    echo -e "${pa}jobname${rt} = $jobname"
+    echo -e "${pa}command${rt} = $command"
+    echo -e "${pa}parfile${rt} = $parfile"
     echo
-    echo "MPIRUN = $MPIRUN"
+    echo -e "${pa}MPIRUN${rt} = $MPIRUN"
 
     if [ -z "${DependOnID}" ]
     then
@@ -1608,6 +1608,13 @@ ${pa}jobname${rt}."
     echo -e "${bt}~/bin/qjob_exe_coms_end${rt}. This file will be treated the same"
     echo -e "way as ${bt}~/bin/qjob_exe_coms_start${rt}, but at the end of the job."
     echo
+    echo -e "${he}EXCLUDING TARGETTED NODES${rt}:"
+    echo -e "To exclude certain nodes when submitting the job, put a list of node names,"
+    echo -e "in a sbatch compatible format, in the file:"
+    echo -e "${bt}~/bin/qjob_exclude_nodes${rt}"
+    echo -e "examples: compute-[11,13],compute-[12-14],compute-15"
+    echo -e "Only the first line will be read from this file."
+    echo
     echo -e "${he}EXAMPLES${rt}:"
     # echo -e "Get 2 epyc7551 nodes with all MPI procs in long queue with max time using"
     # echo -e "nmesh for 2 jobs:"
@@ -1688,7 +1695,7 @@ ${pa}jobname${rt}."
       tpn_max=128
       ppr=64
       nodelist="compute-[11-15]"
-    elif [ C$constraint = Copt6344 ]
+    elif [ C$constraint = Copfind_ah_a1.3008075b_c0.327465_r0.0755.fw.part6344 ]
     then
       nodelist="compute-[6-10]"
     fi
@@ -1750,6 +1757,12 @@ $command $parfile"
 
     fi
 
+    if [[ -f $HOME/bin/qjob_exclude_nodes ]]
+    then
+      read -r exclude $HOME/bin/qjob_exclude_nodes
+      exclude=${exclude%$'\r'}
+    fi
+
     # these two can be used to have more MPI tags with Intel's MPI
     # sum of TAG_BITS and RANK_BITS has to be 39, e.g. 30+9:
     export MPIR_CVAR_CH4_OFI_TAG_BITS
@@ -1757,22 +1770,23 @@ $command $parfile"
     export OMPI_MCA_mpi_preconnect_all=1
 
     # echo -e "HOSTNAME = $HOSTNAME , i.e. KOKO"
-    echo -e "nodes = $nodes"
-    echo -e "ppn = $ppn"
-    echo -e "tpn = $tpn"
-    echo -e "procs = $procs"
-    echo -e "OMP_NUM_THREADS = $OMP_NUM_THREADS"
-    echo -e "walltime = $walltime"
+    echo -e "${pa}nodes${rt} = $nodes"
+    echo -e "${pa}ppn${rt} = $ppn"
+    echo -e "${pa}tpn${rt} = $tpn"
+    echo -e "${pa}procs${rt} = $procs"
+    echo -e "${pa}OMP_NUM_THREADS${rt} = $OMP_NUM_THREADS"
+    echo -e "${pa}walltime${rt} = $walltime"
     # echo -e "queue = $queue"
-    echo -e "pseudo-constraint = $constraint"
-    echo -e "nodelist = $nodelist"
-    echo -e "njobs = $njobs"
+    echo -e "${pa}pseudo-constraint${rt} = $constraint"
+    echo -e "${pa}nodelist${rt} = $nodelist"
+    echo -e "${pa}exclude${rt} = $exclude"
+    echo -e "${pa}njobs${rt} = $njobs"
     # echo -e "account = $account"
-    echo -e "jobname = $jobname"
-    echo -e "command = $command"
-    echo -e "parfile = $parfile"
+    echo -e "${pa}jobname${rt} = $jobname"
+    echo -e "${pa}command${rt} = $command"
+    echo -e "${pa}parfile${rt} = $parfile"
     echo
-    echo -e "MPIRUN = $MPIRUN"
+    echo -e "${pa}MPIRUN${rt} = $MPIRUN"
 
     if [ -z "${DependOnID}" ]
     then
@@ -1791,6 +1805,10 @@ $command $parfile"
 --nodelist=$nodelist \
 -J $jobname \
 -o $parfile.o%J.d$date_ext"
+      if [[ -n $exclude ]]
+      then
+        QSUB="$QSUB --exclude=$exclude"
+      fi
       # echo $LASTJOBID
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
@@ -2087,22 +2105,22 @@ ${pa}jobname${rt}."
     export MPIR_CVAR_CH4_OFI_TAG_BITS
     export MPIR_CVAR_CH4_OFI_RANK_BITS
 
-    echo "HOSTNAME = $HOSTNAME , i.e. ANVIL"
-    echo "nodes = $nodes"
-    echo "ppn = $ppn"
-    echo "tpn = $tpn"
-    echo "procs = $procs"
-    echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"
-    echo "walltime = $walltime"
-    echo "queue = $queue"
+    echo -e "${pa}HOSTNAME${rt} = $HOSTNAME , i.e. DEUCALION"
+    echo -e "${pa}nodes${rt} = $nodes"
+    echo -e "${pa}ppn${rt} = $ppn"
+    echo -e "${pa}tpn${rt} = $tpn"
+    echo -e "${pa}procs${rt} = $procs"
+    echo -e "${pa}OMP_NUM_THREADS${rt} = $OMP_NUM_THREADS"
+    echo -e "${pa}walltime${rt} = $walltime"
+    echo -e "${pa}queue${rt} = $queue"
     #echo "constraint = $constraint"
-    echo "njobs = $njobs"
-    echo "account = $account"
-    echo "jobname = $jobname"
-    echo "command = $command"
-    echo "parfile = $parfile"
+    echo -e "${pa}njobs${rt} = $njobs"
+    echo -e "${pa}account${rt} = $account"
+    echo -e "${pa}jobname${rt} = $jobname"
+    echo -e "${pa}command${rt} = $command"
+    echo -e "${pa}parfile${rt} = $parfile"
     echo
-    echo "MPIRUN = $MPIRUN"
+    echo -e "${pa}MPIRUN${rt} = $MPIRUN"
 
     if [ -z "${DependOnID}" ]
     then
