@@ -1612,7 +1612,7 @@ ${pa}jobname${rt}."
     echo -e "To exclude certain nodes when submitting the job, put a list of node names,"
     echo -e "in a sbatch compatible format, in the file:"
     echo -e "${bt}~/bin/qjob_exclude_nodes${rt}"
-    echo -e "examples: compute-[11,13],compute-[12-14],compute-15"
+    echo -e "Examples: compute-[11,13],compute-[12-14],compute-15"
     echo -e "Only the first line will be read from this file."
     echo
     echo -e "${he}EXAMPLES${rt}:"
@@ -1695,7 +1695,7 @@ ${pa}jobname${rt}."
       tpn_max=128
       ppr=64
       nodelist="compute-[11-15]"
-    elif [ C$constraint = Copfind_ah_a1.3008075b_c0.327465_r0.0755.fw.part6344 ]
+    elif [ C$constraint = Copt6344 ]
     then
       nodelist="compute-[6-10]"
     fi
@@ -1759,7 +1759,7 @@ $command $parfile"
 
     if [[ -f $HOME/bin/qjob_exclude_nodes ]]
     then
-      read -r exclude $HOME/bin/qjob_exclude_nodes
+      read -r exclude < $HOME/bin/qjob_exclude_nodes
       exclude=${exclude%$'\r'}
     fi
 
@@ -1981,6 +1981,13 @@ ${pa}jobname${rt}."
     echo -e "${bt}~/bin/qjob_exe_coms_end${rt}. This file will be treated the same"
     echo -e "way as ${bt}~/bin/qjob_exe_coms_start${rt}, but at the end of the job."
     echo
+    echo -e "${he}EXCLUDING TARGETTED NODES${rt}:"
+    echo -e "To exclude certain nodes when submitting the job, put a list of node names,"
+    echo -e "in a sbatch compatible format, in the file:"
+    echo -e "${bt}~/bin/qjob_exclude_nodes${rt}"
+    echo -e "Examples: compute-[11,13],compute-[12-14],compute-15"
+    echo -e "Only the first line will be read from this file."
+    echo
     echo -e "${he}EXAMPLES${rt}:"
     echo -e "Use 16 nodes in ${bt}normal-x86${rt} queue for full duration for 5 consecutive jobs:"
     echo -e "${bt}qjob 16 all auto max normal-x86 5 f202509520cpcaa3x name.par bamps${rt}"
@@ -2100,6 +2107,12 @@ ${pa}jobname${rt}."
       fi
     fi
 
+    if [[ -f $HOME/bin/qjob_exclude_nodes ]]
+    then
+      read -r exclude < $HOME/bin/qjob_exclude_nodes
+      exclude=${exclude%$'\r'}
+    fi
+
     # these two can be used to have more MPI tags with Intel's MPI
     # sum of TAG_BITS and RANK_BITS has to be 39, e.g. 30+9:
     export MPIR_CVAR_CH4_OFI_TAG_BITS
@@ -2141,6 +2154,10 @@ ${pa}jobname${rt}."
 --exclusive \
 --mem=0 \
 -A $account"
+      if [[ -n $exclude ]]
+      then
+        QSUB="$QSUB --exclude=$exclude"
+      fi
       if [ $LASTJOBID = ThereIsNoJobToDependOn ];
       then
         QSUB2=""
