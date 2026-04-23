@@ -12,6 +12,7 @@ import sys
 import numpy as np
 from itertools import groupby
 import xml.etree.ElementTree as ET
+from typing import Optional, List
 
 class XDMFData:
   """
@@ -31,14 +32,14 @@ class XDMFData:
 
   Additionally there is an option to compute rms value of data
   in each time frame. This can be done by setting `get_rms=True` when calling
-  functions. 
+  functions.
 
   Lastly, if for sake of log computation or rendering somewhere, negative and
   0 data values need to be replaced by some `floor_value`, then it can be passed
   in as `floor = floor_value` to functions.
-  """ 
+  """
   def __init__(self, file_path : str) -> None:
-    self.Nframes : int = None
+    self.Nframes : Optional[int] = None
     # parse the data file
     if os.path.isfile(file_path):
       try:
@@ -46,7 +47,7 @@ class XDMFData:
         self.root = self.tree.getroot()
         frames = self.root.findall(".//Grid[@CollectionType='Spatial']")
         frame_time_pairs = [
-            (frame, float(frame.find('Time').attrib['Value']))
+            (frame, float(frame.find('Time').attrib['Value'])) # type: ignore
             for frame in frames
         ]
         # Sort by time: time is index '1' in (frame,time) pair
@@ -59,7 +60,7 @@ class XDMFData:
                 last_element = element
             unique_frame_time_pairs.append(last_element)
         # extract frames and times
-        self.frames = [pair[0] for pair in unique_frame_time_pairs] 
+        self.frames = [pair[0] for pair in unique_frame_time_pairs]
         self.times = np.array([pair[1] for pair in unique_frame_time_pairs])
         self.Nframes = len(self.frames) # count of total frames
         self.frames_grid_data = {} # to store data in later
@@ -91,8 +92,10 @@ class XDMFData:
     return data.reshape(shape)
 
   ################################
-  def get_single_frama_data(self, time, offset = 0, floor : float = None,
-                            get_rms = False, verbose: bool = False) -> int:
+  def get_single_frama_data(self, time, offset = 0,
+                            floor : Optional[float] = None,
+                            get_rms = False, src='nmesh', plane = 'xy',
+                            verbose: bool = False, ) -> int:
     """
     This function gets data for a single frame from the binary file.
     It enters the time frame data to `XDMFData.frames_grid_data` dictionary as
@@ -138,7 +141,7 @@ class XDMFData:
     """
     if verbose:
       print(f"t={time}", end=" ", flush=True)
-    i_close = 0
+    i_close = -1
     # if type(time) not in self.float_types:
     if not isinstance(time,self.float_types):
       # print("Type: ", type(time))
@@ -150,7 +153,7 @@ class XDMFData:
         i_close = 0
       elif time > self.times[-1]: # same for higher than highest
         i_close = self.Nframes - 1
-      else: # look in values above offset 
+      else: # look in values above offset
         i_close = np.abs(times_in_range - time).argmin()
       # extract data from binary
       t = self.times[i_close] # get closest time value
@@ -170,10 +173,16 @@ class XDMFData:
         attribute = grid.find('Attribute')
         dims = list(map(int, topology.attrib['Dimensions'].split()))
         # print(dims, end=" ")
-        Nx, Ny = dims[1], dims[2]
+        if src == 'nmesh' and plane == 'xy':
+          N1, N2 = dims[1], dims[2]
+        elif src == 'bamps' and plane == 'xz':
+          N1, N2 = dims[2], dims[2]
+        else:
+          sys.exit(f"Unknown codebase/plane combination: {src}/{plane}."
+                   "Exitting.")
         # Read geometry (coordinate data)
         geometry_data_item = geometry.find('DataItem')
-        coords_shape = (Nx*Ny, 3)
+        coords_shape = (N1*N2, 3)
         coords_offset = int(geometry_data_item.attrib['Seek'])
         # print(coords_offset, end=" ")
         coord_file_path = self.parent_dir + geometry_data_item.text.strip()
@@ -200,7 +209,7 @@ class XDMFData:
                                           shape=variable_shape,
                                           offset=variable_offset)
           rms = None
-          N = Nx * Ny # points in this grid          
+          N = N1 * N2 # points in this grid
           if get_rms:
             rms = np.sqrt(np.mean(variable_data**2))
             total_points += N
@@ -208,10 +217,17 @@ class XDMFData:
           if floor and floor in self.float_types:
             # Replace non-positive values with a small number for log scale
             variable_data[variable_data <= 0] = floor
+          # reshape coordinates as needed
+          X = coords[:,0].reshape(N1, N2) if 'x' in plane else None
+          Y = coords[:,1].reshape(N1, N2) if 'y' in plane else None
+          Z = coords[:,2].reshape(N1, N2) if 'z' in plane else None
+
           grids.append({
-            'coords': coords, # shape (Nx*Ny, 3) because it is in (x,y,z) format
-            'variable_data': variable_data.reshape(Nx, Ny),
-            'dims': (Nx, Ny), # dimension
+            'X' : X,
+            'Y' : Y,
+            'Z' : Z,
+            'variable_data': variable_data.reshape(N1, N2),
+            'dims': (N1, N2), # dimension
             'N' : N, # total number of points in this grid
             'rms': rms,    # store the RMS value
           })
@@ -226,14 +242,15 @@ class XDMFData:
         # print("--------------")
         grid_data = {'grids' : grids, 'rms' : total_rms}
         self.frames_grid_data[t] = grid_data
+    return i_close
 
   ################################
   def get_frame_data(self, times = None, all_frames = False,
                      floor : float = None, get_rms = False ,
-                     verbose = False) -> None :
+                     verbose = False, src='nmesh') -> None :
     """
     This function extracts binary data for single or multiple time frames.
-    The argument `times` can either be a `list` or tuple of times (numbers)
+    The argument `times` can either be a `list` or `tuple` of times (numbers)
     or one time value or `None`.
     If `times` is none, then `all_frames` has to be `True`,
     which will get all frames data.
