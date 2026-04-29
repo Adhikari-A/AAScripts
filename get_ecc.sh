@@ -130,7 +130,7 @@ else
   echo "  -FB   : use Force Balance"
   echo "  -noFB : don't use Force Balance"
   echo
-  echo "Assumes exists of properly set following symbolic links:"
+  echo "Assumes existance of properly set following symbolic links:"
   echo "  EccRed_noForceBal.py"
   echo "  EccRed.py"
   echo "  remove_repeat.py"
