@@ -133,7 +133,7 @@ if __name__ == "__main__":
   custom_usage = "get_abs.py PATH1 [ PATH2 ... ] [ -c COL ] " \
                  "[ -xp EXCLUDE_PATHS ] [ -h ] [ -v ]"
   parser = argparse.ArgumentParser(
-          prog='get_strain_with_watpy',
+          prog='get_abs',
           formatter_class=CustomHelpFormatter,
           add_help=False,
           usage=custom_usage,  # Custom usage string.
