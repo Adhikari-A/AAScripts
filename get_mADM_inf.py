@@ -123,7 +123,7 @@ class MassFileData:
         self.data = np.loadtxt(clean_lines)
         if verb > 2:  print("Removed repeated times in data.")
 
-  def get_mADM_at_infinity(self, rrow : int, mrow : IntOrStr, cof : int, 
+  def get_mADM_at_infinity(self, rrow : int, mrow : IntOrStr, cof : int,
                            verb : int) -> None:
     self.r : None | np.ndarray = None
     self.m : None | np.ndarray = None
@@ -136,19 +136,21 @@ class MassFileData:
       if rrow < self.header_nrows:
         # print(rrow, mrow, cof)
         # print(type(self.header))
-        # rline = 
+        # rline =
         self.r = self._get_line_data(self.header[rrow], cof,
                                      header_line=True)
       else:
-        self.r = self._get_line_data(self.datalines[rrow], cof)
-      
+        self.r = self._get_line_data(self.datalines[rrow-self.header_nrows],
+                                     cof)
+
       if type(mrow) == int:
         if mrow < self.header_nrows:
           self.m = self._get_line_data(self.header[mrow], cof, header=True)
         else:
-          self.m = self._get_line_data(self.datalines[mrow], cof)
+          self.m = self._get_line_data(self.datalines[mrow-self.header_nrows],
+                                       cof)
       else:
-        data_mrow = 0 if rrow < self.header_nrows else rrow+1
+        data_mrow = 0 if rrow < self.header_nrows else rrow-self.header_nrows+1
         self.target_data_lines = self.datalines[data_mrow:]
         self._remove_repeated_times(tcol, verb)
         if np.any(self.data):
@@ -160,7 +162,7 @@ class MassFileData:
       if not np.any(self.m):
         print("Could not figure out mass data. Skipping.")
         return
-      
+
       mADM = InfinityExtrapolation(self.r, self.m, deg=5)
       if np.any(mADM.val_inf):
         if self.m.ndim == 1:

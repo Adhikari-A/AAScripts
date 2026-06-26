@@ -42,7 +42,7 @@ class CustomHelpFormatter(argparse.ArgumentDefaultsHelpFormatter,
 ################################################
 # main part
 
-custom_usage = "create_times_file_from_bin_files.py PATH1 [ PATH2 ... ] [ -p PLANE ] \n" \
+custom_usage = "create_times_file_from_bin_files.py PATH1 [ PATH2 ... ] [ -ahs AH_SUBDIR ] [ -p PLANE ] \n" \
                "                            [ -tf TIMES_FILE ]  [ -xp EXCLUDE_PATHS ] [ -h ] [ -v ] "
 
 parser = argparse.ArgumentParser(
@@ -59,7 +59,10 @@ required.add_argument('paths', metavar='paths', nargs='+',
                       help="bamps output data dir paths (can be glob expressions)",)
 
 optional = parser.add_argument_group('Optional')
-optional.add_argument('-p', '--plane', type=str, default='xz', dest='plane', 
+optional.add_argument('-ahs', '--ahsubdir', type=str, default='output_ah',
+                      dest='ahs', metavar='AH_SUBDIR',
+                      help='subdir inside output directory containing PLANE')
+optional.add_argument('-p', '--plane', type=str, default='xz', dest='plane',
                       help='output plane')
 optional.add_argument('-tf', '--timesfile', type=str, dest='tf',
                       metavar='TIMES_FILE', default='times.syn',
@@ -78,6 +81,7 @@ dl  = "-------------------------------------------------------------------"
 ddl = "==================================================================="
 
 paths         = args.paths
+ahs           = args.ahs
 plane         = args.plane
 tf            = args.tf
 exclude_paths = args.excludepaths
@@ -94,48 +98,48 @@ for path_string in paths:
   if this_paths_batch:
     for path in this_paths_batch:
       if path.name not in exclude_paths:
+        oah = path / ahs
         print(dl)
         print("Processing:")
-        print(str(path.resolve()))
-        print()
-      oah = path / "output_ah" 
-      if not oah.is_dir():
-        print("Could not locate output_ah dir:")
         print(str(oah.resolve()))
-        print("Skipping.")
-        continue
-      bindir = oah / plane
-      if not bindir.is_dir():
-        print(f"Could not locate {plane} output_ah dir:")
-        print(str(bindir.resolve()))
-        print("Skipping.")
-        continue
-      ah_times_files = list(Path(bindir).glob("*.bin"))
-      if not ah_times_files:
-        print(f"Could not locate .bin files in dir:")
-        print(str(bindir.resolve()))
-        sys.exit("Skipping.")
-      print(f"Number of files found: {len(ah_times_files)}. Sorting files.")
+        print()
+        if not oah.is_dir():
+          print("Could not locate output_ah dir:")
+          print(str(oah.resolve()))
+          print("Skipping.")
+          continue
+        bindir = oah / plane
+        if not bindir.is_dir():
+          print(f"Could not locate {plane} output_ah dir:")
+          print(str(bindir.resolve()))
+          print("Skipping.")
+          continue
+        ah_times_files = list(Path(bindir).glob("*.bin"))
+        if not ah_times_files:
+          print(f"Could not locate .bin files in dir:")
+          print(str(bindir.resolve()))
+          sys.exit("Skipping.")
+        print(f"Number of files found: {len(ah_times_files)}. Sorting files.")
 
-      indexed = [(int(f.name.split('.')[0]), f) for f in ah_times_files]
-      indexed.sort(key=lambda t: t[0])
-      timesfile = oah / tf
-      if timesfile.is_file():
-        print(f"File already exists:\n{str(timesfile.resolve())}")
-        tokens = (str(datetime.datetime.now())).split()
-        tokens[1] = tokens[1].split('.')[0]
-        # cur_time = tokens[0].replace('-','')+tokens[1].replace(':','')
-        cur_time = tokens[0]+"."+tokens[1].replace(':','-')
-        timesfile = oah / f"{tf}.{cur_time}"
-        print(f"Storing output in alternate file:\n{str(timesfile.resolve())}")
-      else:
-        print(f"Storing output in file:\n{str(timesfile.resolve())}")
+        indexed = [(int(f.name.split('.')[0]), f) for f in ah_times_files]
+        indexed.sort(key=lambda t: t[0])
+        timesfile = oah / tf
+        if timesfile.is_file():
+          print(f"File already exists:\n{str(timesfile.resolve())}")
+          tokens = (str(datetime.datetime.now())).split()
+          tokens[1] = tokens[1].split('.')[0]
+          # cur_time = tokens[0].replace('-','')+tokens[1].replace(':','')
+          cur_time = tokens[0]+"."+tokens[1].replace(':','-')
+          timesfile = oah / f"{tf}.{cur_time}"
+          print(f"Storing output in alternate file:\n{str(timesfile.resolve())}")
+        else:
+          print(f"Storing output in file:\n{str(timesfile.resolve())}")
 
-      with open(timesfile, 'w') as ftimes:
-        for it, fbin in indexed:
-          ahinfo = AHFInfo(fbin)
-          # print(it, fbin.name, ahinfo.evolve_step, ahinfo.time)
-          ftimes.write(f"{ahinfo.evolve_step} {ahinfo.time}\n")
+        with open(timesfile, 'w') as ftimes:
+          for it, fbin in indexed:
+            ahinfo = AHFInfo(fbin)
+            # print(it, fbin.name, ahinfo.evolve_step, ahinfo.time)
+            ftimes.write(f"{ahinfo.evolve_step} {ahinfo.time}\n")
 
 print(ddl)
 print("'Exiting program.'")
