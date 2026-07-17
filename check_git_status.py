@@ -38,16 +38,16 @@ def perform_operations(d):
   print("Status:")
   os.system("git status")
   print()
-  print("Current git repo version:")
+  print("Current git repo version:\n")
   # os.system("git rev-parse HEAD")
   os.system("git log -1 | head -5")
   print()
-  print(f"Creating diff patch: {name}\n")
+  print(f"Creating diff patch: {name}")
   os.system(f"git diff > {name}")
   patch_file = Path(name)
   if patch_file.is_file() and patch_file.stat().st_size == 0:
     print("No diffs found. Deleting file.")
-    patch_file.unlink()
+    patch_file.unlink
 
 projects_dir = "src/projects/"
 if not os.path.isdir(projects_dir):
