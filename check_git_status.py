@@ -38,7 +38,7 @@ def perform_operations(d):
   print("Status:")
   os.system("git status")
   print()
-  print("Current git repo version:\n")
+  print("Current git repo version:")
   # os.system("git rev-parse HEAD")
   os.system("git log -1 | head -5")
   print()
