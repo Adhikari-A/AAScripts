@@ -47,7 +47,7 @@ def perform_operations(d):
   patch_file = Path(name)
   if patch_file.is_file() and patch_file.stat().st_size == 0:
     print("No diffs found. Deleting file.")
-    patch_file.unlink
+    patch_file.unlink()
 
 projects_dir = "src/projects/"
 if not os.path.isdir(projects_dir):
