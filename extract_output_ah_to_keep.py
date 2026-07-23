@@ -82,6 +82,10 @@ optional.add_argument('-nfirst', type=int, default=30,
                       help="number of consecutive files to keep form first AH file",)
 optional.add_argument('-plane', type=str, default='xz',
                       help='output plane')
+optional.add_argument('-sp','--savepath', dest='savepath',
+                      metavar='SAVE_PATH', type=str,
+                      help="path to save files we retain\n"
+                      "(defaul: PATH/output_ah/keep)",)
 optional.add_argument('-xp','--excludepaths', dest='excludepaths',
                       metavar='EXCLUDE_PATHS', type=str,
                       help="Space delimited list of paths to exclude "
@@ -101,6 +105,7 @@ nkeep         = args.nkeep
 nprev         = args.nprev
 nfirst        = args.nfirst
 plane         = args.plane
+savepath      = args.savepath
 exclude_paths = args.excludepaths
 
 print(ddl)
@@ -180,10 +185,10 @@ if path.name not in exclude_paths:
   if len(keep) < 0:
     print("No files found to keep")
     sys.exit("Skipping.")
-  print("Making keep directory.")
-  keep_dir = oah / "keep"
+  print("Making save directory.")
+  keep_dir = Path(savepath) if savepath else oah / "keep"
   keep_dir.mkdir(parents=True, exist_ok=True)
-  print("Moving files to keep dir:")
+  print("Moving files to save dir:")
   print(str(keep_dir.resolve()))
   print("Files being moved:")
   for file in keep:
