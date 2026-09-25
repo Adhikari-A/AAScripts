@@ -2152,6 +2152,7 @@ ${pa}jobname${rt}."
 -p $queue \
 -o $parfile.o%J.d$date_ext \
 --exclusive \
+--no-requeue \
 --mem=0 \
 -A $account"
       if [[ -n $exclude ]]
